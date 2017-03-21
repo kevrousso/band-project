@@ -132,6 +132,8 @@ a { text-decoration: none; }
 }
 #types a.filter.selected { border: 1px solid #5E5E5E; }
 
+form#upload input { display: none; }
+
 .highlight { background-color: yellow }
 
 

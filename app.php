@@ -12,6 +12,8 @@
 	    }
 	}
 
+	/* !!!!!!!!!!!!!!!!!! POST Files, add "content" attribute*/
+
 	function getFolders() {
 		//echo '{}';
 		$sql = "SELECT * FROM folders ORDER BY name";

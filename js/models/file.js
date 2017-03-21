@@ -6,8 +6,8 @@
 			name: 'File name',
 			machineName: 'File_Name',
 			folderID: 0,
-			type: 'file',	//file, music, video, image
-			path: '',
+			type: 'file',	//file, audio, video, image
+			content: '',
 			dateCreated: ''
 		}
 	});

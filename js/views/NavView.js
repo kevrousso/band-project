@@ -23,7 +23,8 @@ var app = app || {};
 			this.$mainContent = $('#mainContent');
 			this.$container = $('#container');
 			this.$navContent = this.$el.find("#navContent");
-			this.$form = $(".addComment");
+			this.$formAddFile = $("#upload");
+			this.$formConvo = $(".addComment");
 			this.$spinner = this.$el.find(".spinner");
 			this.$filters = this.$el.find("#filters");
 			this.$types = this.$filters.find("#types");
@@ -125,10 +126,8 @@ var app = app || {};
 						//validate that there isn't already a folder with that name
 						if (that.isFolderNameUnique(foldername)) {
 							//get max id and incremente it by 1 because ids are Unique
-							var model = that.collection.max(function(m){
-								return m.get('id');
-							});
-							var newFolder = new app.Folder({ id: model.get("id")+1, name: foldername, machineName: foldername });
+							var maxID = that.getMaxFolderID(),
+								newFolder = new app.Folder({ id: parseInt(maxID)+1, name: foldername, machineName: foldername });
 							that.collection.add(newFolder);
 							that.render();
 						} else {
@@ -137,6 +136,44 @@ var app = app || {};
 					}
 				break;
 				case "addfile":
+					this.$formAddFile.find("input").on('change', function(e) {
+						e.preventDefault();
+						var fileInfo = e.target.files[0],
+							filename = fileInfo.name,
+							type = fileInfo.type.split("/")[0];
+						//validate that there isn't already a file with that name
+						if (that.isFileNameUnique(filename)) {
+								//checks if folder hasContent and defaults to first </a>
+							var foldername = $el.find("a.hasContent").text().trim() || $el.find("a").text().trim(),
+								folder = _.filter(that.collection.models, function(m){
+									return m.get('name') === foldername;
+								}),
+								folderID = folder[0].get("id"),
+								currentfiles = folder[0].get("files");
+								//get max id and incremente it by 1 because ids are Unique
+							var maxID = that.getMaxFileID();
+							
+							if (type !== "audio" && type !== "video" && type !== "image") {
+								type = "file";
+							}
+							var newFile = new app.File({
+								id: parseInt(maxID)+1,
+								name: filename,
+								machineName: app.utils.cleanUpSpecialChars(filename),
+								folderID: folderID,
+								type: type,
+								dateCreated: new Date()
+							});
+
+							//update files collection
+							that.files.models.push(newFile);
+							currentfiles.push(newFile);
+
+							that.render();
+						}
+						return false;
+					});
+					this.$formAddFile.find("input").trigger("click");
 				// TODO
 					//pop a file upload window
 					//add model to collection and RENDER
@@ -170,8 +207,29 @@ var app = app || {};
 			//re-store a copy of collection 
 			directoryData = this.collection.toJSON();
 		},
+		getMaxFolderID: function() {
+			return this.collection.max(function(m){
+				return m.get('id');
+			}).get("id");
+		},
+		getMaxFileID: function() {
+			var tmpID = 0;
+			_.each(this.files.models, function(m) {
+				tmpID = m.get('id') > tmpID ? m.get('id') : tmpID;
+			});
+			return parseInt(tmpID, 10);
+		},
 		isFolderNameUnique: function(name) {
 			return !this.collection.findWhere({name: name});
+		},
+		isFileNameUnique: function(name) {
+			var unique = true;
+			_.each(this.files.models, function(file) {
+				if (file.get('name') === name) {
+					unique = false;
+				} 
+			});
+			return unique;
 		},
 		getFolderByName: function(name) {
 			return _.filter(this.collection.models, function(folder) {
@@ -277,13 +335,13 @@ var app = app || {};
 		_updateContent: function(src, type) {
 			var html = "", that = this, align = "";
 			switch (type) {
-				case "music":
+				case "audio":
 					html += '<audio id="player-audio" controls="controls" preload="metadata">';
 					html +=		'Votre navigateur ne supporte pas l\'élément <code>audio</code> element.';
 					html += 	'<source src="'+src+'" type="audio/mp3">';
 					html +=	'</audio>';
 
-					this.$form.show();
+					this.$formConvo.show();
 					align = "top";
 				break;
 				case "video":
@@ -294,7 +352,7 @@ var app = app || {};
 					html += 	'<source src="'+src+'.ogv" type="video/ogg">';
 					html +=	'</video>';
 
-					this.$form.show();
+					this.$formConvo.show();
 					align = "top";
 				break;
 				case "image":
@@ -303,7 +361,7 @@ var app = app || {};
 				break;
 				case "file":
 					html += "<h3 class='noPreview'>No preview availlable</h3>";
-					this.$form.hide();
+					this.$formConvo.hide();
 					align = "middle";
 				break;
 			}
