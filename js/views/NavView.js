@@ -24,9 +24,12 @@ app.NavView = Backbone.View.extend({
 		this.$filters = this.$el.find("#filters");
 		this.$types = this.$filters.find("#types");
 		this.$container = $('#container');
+
+		this.$logout = $("a.logout");
+		this.$logout.show();
 		
 		this.resize();
-		$(window).on("resize", that.resize);
+		//$(window).on("resize", this.resize);
 
 		//load proper template
 		app.utils.loadTemplate("NavView");
@@ -77,6 +80,8 @@ app.NavView = Backbone.View.extend({
 			that.$navContent.fadeIn(250);
 		});
 
+		//empty and update Filters
+		this.$types.html("").append(that._createFilters());
 		this.updateSearchUI();
 		this.updateFiltersUI();
 		this.$scrollable.perfectScrollbar({
@@ -194,6 +199,7 @@ app.NavView = Backbone.View.extend({
 							that.$formAddFile.find("input[name=fileMachineName]").val(newFile.get("machineName"));
 							that.$formAddFile.find("input[name=fileFolderID]").val(newFile.get("folderID"));
 							that.$formAddFile.find("input[name=fileType]").val(newFile.get("type"));
+							that.$formAddFile.find("input[name=folderMachineName]").val(folder.get("machineName"));
 							that.$formAddFile.submit();
 						} else {
 							alert("File already exist in that folder.");
@@ -218,21 +224,38 @@ app.NavView = Backbone.View.extend({
 					} else if (type === "file") {
 						model = that.getModelByName(that.files.models, name);
 					}
-					oldName = model.get("machineName");
+					oldMachineName = model.get("machineName");
 					id = model.get("id");
-
-					that.renameElement(type, name, newName, newMachineName);
+					folderID = model.get("folderID");
 
 					if (type === "folder") {
-						app.utils.postData("renameFolder", {id: id, oldName: oldName, newName: newName, newMachineName: newMachineName});
+						app.utils.postData("renameFolder", {id: id, oldMachineName: oldMachineName, newName: newName, newMachineName: newMachineName});
+						that.renameElement(type, name, newName, newMachineName, "");
+						that.render();
 					} else if (type === "file") {
-						app.utils.postData("renameFile", {id: id, oldName: oldName, newName: newName, newMachineName: newMachineName});
+						folder = that.getModelByID(that.collection.models, model.get("folderID"));
+						app.utils.postData("renameFile", 
+							{
+								id: id,
+								folderID: folderID,
+								oldMachineName: oldMachineName,
+								newName: newName,
+								newMachineName: newMachineName,
+								folderMachineName: folder.get("machineName")
+							}, function (data, textStatus, jqXHR) {
+								if (data !== "") {
+									data = JSON.parse(data);
+									that.renameElement(type, name, data.newName, data.newMachineName, data.path);
+									that.render();
+								}
+							}
+						);
 					}
 				}
 			break;
 			case "delete":
 				var msg = 'Do you really want to permanantly delete '+ type +' "'+ name +'" ?',
-					modelMachineName = "", fileModel, folderModel;
+					fileModel, folderModel;
 				if ($el.find("a").hasClass("hasContent")) {
 					msg = 'Do you really want to permanantly delete '+ type +' "'+ name +'" and ALL it\'s content ?';
 				}
@@ -247,8 +270,11 @@ app.NavView = Backbone.View.extend({
 						that.collection.remove(folderModel);
 					} else {
 						fileModel = that.getModelByName(that.files.models, name);
+						folder = that.getModelByID(that.collection.models, fileModel.get("folderID"));
+
 						that.removeFileByName(name);
-						app.utils.postData("deleteFile", fileModel.get("machineName"));
+						app.utils.postData("deleteFile", 
+							{fileID: fileModel.get("id"), fileMachineName: fileModel.get("machineName"), folderMachineName: folder.get("machineName")});
 					}
 					that.render();
 				}
@@ -259,17 +285,17 @@ app.NavView = Backbone.View.extend({
 	//@param oldName: string
 	//@param name: string
 	//@param machineName: string
-	renameElement: function(type, oldName, name, machineName) {
+	//@param path: string
+	renameElement: function(type, oldName, newName, machineName, path) {
 		var model;
 		if (type === "folder") {
 			model = this.getModelByName(this.collection.models, oldName);
 		} else if (type === "file") {
 			model = this.getModelByName(this.files.models, oldName);
+			model.set("path", path);
 		}
-		model.set({
-			"name": name,
-			"machineName": machineName
-		});
+		model.set("name", newName);
+		model.set("machineName", machineName);
 	},
 	//@param collection: Backbone Collection
 	//return: int
@@ -303,6 +329,14 @@ app.NavView = Backbone.View.extend({
 	getModelByName: function(collection, name) {
 		return _.find(collection, function(mod) {
 			return mod.get("name") === name;
+		});
+	},
+	//@param collection: Backbone collection
+	//@param name: string
+	//return: model
+	getModelByID: function(collection, id) {
+		return _.find(collection, function(mod) {
+			return mod.get("id") === id;
 		});
 	},
 	//@param name: string
@@ -392,9 +426,7 @@ app.NavView = Backbone.View.extend({
 	// TODO: make function without args, bing it to (change:showContent)
 	showContent: function(e, routing) {
 		var $this = $(e.target),
-			$files = $(".content li"),
-			src = $this.attr("href"),
-			type = $this.attr("class");
+			$files = $(".content li");
 
 		if (!$this.parent().hasClass("selected")) {
 			//removeClass of every subMenu item
@@ -405,7 +437,7 @@ app.NavView = Backbone.View.extend({
 				$this.parent().toggleClass("selected");
 			}
 			var file = this.getModelByName(this.files.models, $this.text());
-			this.trigger("change:updateViewArea", {fileID: file.id, src: src, type: type});
+			this.trigger("change:updateViewArea", {fileID: file.id, src: file.get("path"), type: file.get("type")});
 		}
 	},
 	/*Filter events*/
@@ -482,6 +514,6 @@ app.NavView = Backbone.View.extend({
 	},
 	//@param data: object {fileID:"", src:"", type:""}
 	updateViewArea: function(data) {
-		ConvoView.trigger("change:updateView", data);
+		FileCommentsView.trigger("change:updateView", data);
 	}
 });

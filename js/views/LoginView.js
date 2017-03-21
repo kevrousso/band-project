@@ -26,7 +26,7 @@ app.LoginView = Backbone.View.extend({
 			if (data) {
 				//init Navigation View
 				NavView = new app.NavView();
-				ConvoView = new app.ConvoView({user: data});
+				FileCommentsView = new app.FileCommentsView({user: data});
 			} else {
 				//not logged-in, show the form
 				that.$el.show();
@@ -53,7 +53,7 @@ app.LoginView = Backbone.View.extend({
 							that.$el.fadeOut(250, function() {
 								//init Navigation View
 								NavView = new app.NavView();
-								ConvoView = new app.ConvoView({user: data});
+								FileCommentsView = new app.FileCommentsView({user: data});
 							});
 						} else {
 							that.updateMessage(data);

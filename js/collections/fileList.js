@@ -9,11 +9,11 @@ var app = app || {};
 			return _.map(response, function(item, index) {
 				return {
 					id: item.id,
-					name: item.name,
-					type: item.type,
 					folderID: item.folder_id,
-					content: item.content,
+					name: item.name,
 					machineName: item.machine_name,
+					type: item.type,
+					path: item.path,
 					dateCreated: item.date_created
 				};
 			});

@@ -3,9 +3,11 @@
 	app.File = Backbone.Model.extend({
 		defaults: {
 			id: 0,
+			folderID: 0,
 			name: 'File name',
 			machineName: 'File_Name',
-			folderID: 0,
-			type: 'file'	//file, audio, video, image
+			path: '',
+			type: 'file',	//file, audio, video, image
+			dateCreated: ''
 		}
 	});

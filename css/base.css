@@ -90,10 +90,11 @@ header.wrapper {
 .main-container h3.noSelection{ text-align: center; }
 .main-container a.preview { max-width: 25%; text-align: center; margin: 0 auto; display: table; }
 .main-container a.preview img, .main-container a.fullscreen img { width: 100%;height: 100%; }
-.main-container a.fullscreen img { max-width: 80%; height: auto; }
+.main-container a.fullscreen img { width: auto; max-width: 80%; height: auto; }
+
 .main-container .scrollable {
 	position: absolute;
-	bottom: 0;
+	bottom: 10%;
 	width: 90%;
 	box-sizing: border-box;
 }
@@ -108,6 +109,7 @@ header.wrapper {
 }
 .header-container .title { color: white; font-weight: normal; }
 .header-container .logout-wrap { vertical-align: middle; display: table-cell; }
+.header-container .logout-wrap .logout { display: none; }
 
 .full-img {
 	position: fixed;
@@ -120,7 +122,7 @@ header.wrapper {
 	display: none;
 	overflow-y: scroll;
 }
-.full-img a.fullscreen { display: table-cell; vertical-align: middle; width: 100%; height: inherit; padding: 2% 0; }
+.full-img a.fullscreen { display: table-cell; vertical-align: middle; height: inherit; padding: 2% 0; }
 .full-img img { box-shadow: 0 0 30px 3px black; }
 
 /* Filters */
@@ -281,7 +283,7 @@ form#upload input { display: none; }
 	text-align: left;
 	box-sizing: border-box;
 }
-
+.comment-wrap .comment-holder .comment .timestamp { text-decoration: underline; }
 
 .main #comments { margin-top: 25px; }
 .main form {
@@ -327,8 +329,10 @@ form#upload input { display: none; }
 /*Style 2*/
 #login form .input-wrap, #login form .rememberMe-wrap { position: relative; margin: 0 auto; display: table; background-color: rgba(34, 34, 34, 0.51); margin-top: 10px; }
 #login form .rememberMe-wrap { width: 10em; padding: 5px; }
-#login form .rememberMe-wrap label { color: #CCC; }
-#login form .rememberMe-wrap input[type="checkbox"] { margin-left: 20px; top: 2px; position: relative; }
+#login form .rememberMe-wrap label { color: #CCC; padding: 10px; padding-right: 20px; }
+#login form .rememberMe-wrap label:hover,
+#login form .rememberMe-wrap input[type="checkbox"] { cursor: pointer; }
+#login form .rememberMe-wrap input[type="checkbox"] { top: 2px; position: relative; }
 #login form input[type=text], #login form input[type=password] { width: 20em; margin: 0 auto; display: list-item; margin-bottom: 5px; margin-top: 5px; }
 #login form input[type=text], #login form input[type=password] { text-indent: 50px; opacity: 0.8; color: #EBEBEB; border: none; background-color: transparent; }
 #login form .input-wrap label { position: absolute; color: #CCC; margin-top: 0.5em; left: 10px; }

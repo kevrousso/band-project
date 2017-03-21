@@ -138,12 +138,13 @@
 								<!--to be populated by app-->
 							</ul>
 						</nav>
-						<form id="upload" method="POST" action="api/pp.php" enctype="multipart/form-data">
+						<form id="upload" method="POST" action="api/app.php" enctype="multipart/form-data">
 							<input type="hidden" name="action" value="postFile">
 							<input type="hidden" name="fileName">
 							<input type="hidden" name="fileMachineName">
 							<input type="hidden" name="fileFolderID">
 							<input type="hidden" name="fileType">
+							<input type="hidden" name="folderMachineName">
 							<input type="file" name="uploaded_file" accept="image/*, audio/*, video/*, .txt, .doc, docx">
 						</form>
 					</div>
@@ -196,14 +197,14 @@
 
 		<script src="js/models/file.js"></script>
 		<script src="js/models/folder.js"></script>
-		<script src="js/models/convo.js"></script>
+		<script src="js/models/fileComment.js"></script>
 		<script src="js/collections/fileList.js"></script>
 		<script src="js/collections/folderList.js"></script>
-		<script src="js/collections/convoList.js"></script>
+		<script src="js/collections/fileCommentsList.js"></script>
 		<script src="js/views/AppView.js"></script>
 		<script src="js/views/LoginView.js"></script>
 		<script src="js/views/NavView.js"></script>
-		<script src="js/views/ConvoView.js"></script>
+		<script src="js/views/FileCommentsView.js"></script>
 		<script src="js/routers/router.js"></script>
 		<script src="js/app.js"></script>
 	</body>

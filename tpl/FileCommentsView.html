@@ -1,0 +1,16 @@
+<% if (item) { %>
+<div class="comment-wrap">
+	<span class="user-icon">
+		<svg class="icon-user" viewBox="0 0 15 15">
+			<use xlink:href="#icon-user"></use>
+		</svg>
+	</span>
+	<div class="comment-holder">
+		<p class="user-info">
+			<span class="name"><%=item.username%></span>
+			<span class="time"><%=item.timestamp%></span>
+		</p>
+		<pre class="comment"><%=item.comment%></pre>
+	</div>
+</div>
+<% } %>

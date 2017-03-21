@@ -15,7 +15,7 @@ app.utils = {
 				}
 			},
 			error: function(resp) {
-				console.error("Error: "+resp);
+				console.log("Error: ",resp);
 			}
 		});
 	},

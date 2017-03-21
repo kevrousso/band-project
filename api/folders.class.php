@@ -33,31 +33,36 @@ class Folders {
 		$this->db->bind(':folderName', $folderName);
 		$this->db->bind(':folderMachineName', $folderMachineName);
 		$this->db->execute();
+
+		//create folder Dir if not exist
+		mkdir("../".UPLOAD_DIR."/".$folderMachineName);
 	}
 	public function renameFolder() {
 		//Folder data
 		$data = json_decode($_POST["_data"]);
-		$oldName = $data->oldName;
+		//TODO: maybe add a "/" in case the folder name exist also in file name...
+		$newMachineName = $data->newMachineName;
+		$oldMachineName = $data->oldMachineName;
+
 		$newName = $data->newName;
 		$id = $data->id;
 
 		$this->db->query('UPDATE folders SET name = :name, machine_name = :machineName WHERE id = :id');
 		$this->db->bind(':name', $newName);
-		$this->db->bind(':machineName', $newName);
+		$this->db->bind(':machineName', $newMachineName);
 		$this->db->bind(':id', $id);
 		$this->db->execute();
 
 		//replace old folder name by new one
-		$this->db->query('UPDATE files SET path = REPLACE(path, :oldName, :newName) WHERE folder_id = :id');
-		// add a / in case the folder name exist also in file name...
-		$this->db->bind(':oldName', $oldName."/");	
-		$this->db->bind(':newName', $newName."/");
+		$this->db->query('UPDATE files SET path = REPLACE(path, :oldMachineName, :newMachineName) WHERE folder_id = :id');
+		$this->db->bind(':oldMachineName', $oldMachineName);	
+		$this->db->bind(':newMachineName', $newMachineName);
 		$this->db->bind(':id', $id);
 		$this->db->execute();
 
 		// uploads."/".folderName
-		$oldPath = UPLOAD_DIR."/".$oldName;
-		$newPath = UPLOAD_DIR."/".$newName;
+		$oldPath = "../".UPLOAD_DIR."/".$oldMachineName;
+		$newPath = "../".UPLOAD_DIR."/".$newMachineName;
 
 		//rename in directory uploads
 		rename($oldPath, $newPath);
@@ -76,6 +81,30 @@ class Folders {
 		$this->db->query('DELETE FROM files WHERE folder_id = :id');
 		$this->db->bind(':id', $id);
 		$this->db->execute();
+
+		//TODO
+		//delete comments referencing to that folder
+		/*$this->db->query('DELETE FROM fileComments WHERE folder_id = :id');
+		$this->db->bind(':id', $id);
+		$this->db->execute();*/
+
+		$path = "../".UPLOAD_DIR."/".$machineName;
+		$this->deleteFolderWithFiles($path);
+	}
+	private function deleteFolderWithFiles($dir) {
+		//loop through all files, and delete them, 
+		//so it is not causing a security issue when deleting folder only
+		if (is_dir($dir)) { 
+			$objects = scandir($dir); 
+			foreach ($objects as $object) { 
+				if ($object != "." && $object != "..") { 
+					if (filetype($dir."/".$object) == "dir") 
+						rrmdir($dir."/".$object); else unlink($dir."/".$object); 
+				} 
+			} 
+			reset($objects); 
+			rmdir($dir); 
+		}
 	}
 }
 

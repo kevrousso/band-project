@@ -9,7 +9,6 @@ app.AppView = Backbone.View.extend({
 		var that = this;
 
 		this.$headerContainer = this.$el.find('.header-container');
-		this.$title = this.$headerContainer.find(".title");
 		this.$container = this.$el.find("#container");
 		this.$footerContainer = this.$el.find('.footer-container');
 
@@ -37,9 +36,5 @@ app.AppView = Backbone.View.extend({
 	//triggered when user closes tab/window
 	updateStatus: function() {
 		app.utils.postData("updateStatus", {status: "offline"});
-	},
-	//@param username: String
-	updateWelcomeMsg: function(username) {
-		this.$title.html("Welcome " + username.capitalize() + "!");
 	}
 });
