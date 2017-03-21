@@ -1,15 +1,4 @@
+added: 
+
 
 modified:
-
-base.css
-LoginView.js
-index.html
-navView
-ConvoView
-
-
-//usefull for Login page
-https://dribbble.com/shots/1187493-Log-in-GIF-animation?list=searches&offset=7&page=2&tag=login
-http://www.videoblocks.com/videos/details/time-lapse-evening-clouds-drifting/
-
-https://dribbble.com/shots/1521095-Wander-Login?list=searches&tag=login&offset=29

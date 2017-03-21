@@ -171,21 +171,23 @@ form#upload input { display: none; }
 
 /*Loadng Icon: http://tobiasahlin.com/spinkit/*/
 .spinner {
-  margin: 0 auto;
-  width: 50px;
-  height: 30px;
-  text-align: center;
-  font-size: 10px;
-  display: none;
+	margin: 0 auto;
+	left: 48%;
+	top: 200px;
+	position: absolute;
+	height: 30px;
+	text-align: center;
+	font-size: 10px;
+	display: none;
 }
 
 .spinner > div {
-  height: 100%;
-  width: 6px;
-  display: inline-block;
-  
-  -webkit-animation: stretchdelay 1.2s infinite ease-in-out;
-  animation: stretchdelay 1.2s infinite ease-in-out;
+	height: 100%;
+	width: 6px;
+	display: inline-block;
+
+	-webkit-animation: stretchdelay 1.2s infinite ease-in-out;
+	animation: stretchdelay 1.2s infinite ease-in-out;
 }
 #login .spinner { position: absolute; width: 100%; top: -50px; }
 #login .spinner > div { background-color: #ccc; }
@@ -218,17 +220,17 @@ form#upload input { display: none; }
 
 @keyframes stretchdelay {
   0%, 40%, 100% { 
-    transform: scaleY(0.4);
-    -webkit-transform: scaleY(0.4);
+	 transform: scaleY(0.4);
+	 -webkit-transform: scaleY(0.4);
   }  20% { 
-    transform: scaleY(1.0);
-    -webkit-transform: scaleY(1.0);
+	 transform: scaleY(1.0);
+	 -webkit-transform: scaleY(1.0);
   }
 }
 
 /* ==============
 		FORM
-   ============== */
+	============== */
 
 .comment { display: table; margin-bottom: 30px; width: 100%; position: relative; }
 .comment .user {
@@ -260,14 +262,16 @@ form#upload input { display: none; }
 
 /* ==============
 	MOBILE: Menu
-   ============== */
+	============== */
 
 /* Login section */
 /*background url: http://wallpaperswide.com/armenia_secret_2-wallpapers.html*/
-.login-container { background: url(../img/armenia_secret_2-wallpaper-1920x1080.jpg); background-repeat: no-repeat; background-size: cover; background-position: center; width: 100%; height: 100%; position: absolute; z-index: 99999999; }
+.login-container { display: none; background: url(../img/armenia_secret_2-wallpaper-1920x1080.jpg); background-repeat: no-repeat; background-size: cover; background-position: center; width: 100%; height: 100%; position: absolute; z-index: 99999999; }
 .login-container video { position: fixed; width:100%; }
 #login { margin: 0 auto; height: 100%; float: left; width: 100%; position: relative; }
-#login h1.bandname { font-family: "Devil Breeze Medium" !important; color: #CCC; text-align: center; position: relative; font-size: 5em; text-transform: lowercase; }
+#login h1.bandname, #login h2 { text-shadow: 0px 0px 10px black; text-align: center; }
+#login h1.bandname { font-size: 5em; font-family: "Devil Breeze Medium" !important; color: #CCC; position: relative; text-transform: lowercase; }
+#login h2 { position: absolute; margin: 0 auto; width: 100%; color: #E44A1A; font-size: 1.5em; font-family: Helvetica, sans-serif !important; text-transform: capitalize; }
 #login form { margin: 0 auto; position: relative; top: 45%; text-align: center; }
 
 /*Style 1: clean, only border-bottom under inputs*/
@@ -286,7 +290,7 @@ form#upload input { display: none; }
 #login form input[type=text], #login form input[type=password] { text-indent: 50px; opacity: 0.8; color: #EBEBEB; border: none; background-color: transparent; }
 #login form label { position: absolute; margin-top: 0.5em; left: 10px; }
 #login form .input-wrap:after { content: ""; position: absolute; left: 45px; top: 7px; height: 30px; border-left: 1px solid #FFF; }
-#login form input[type=submit] { display: none; }
+#login form input[type=submit] { width:0; padding: 0; border: none; }
 
 #login form .invalid {
 	background-color: rgba(34, 34, 34, 0.85);
@@ -296,13 +300,11 @@ form#upload input { display: none; }
 	margin-top: 10px;
 	display: none;
 }
-#login form .invalid .error { color: #FF4136; }
-
+.error { color: #FF4136 !important; }
 
 #login form label svg { fill: #FFF; width: 25px; height: 25px; }
-#login form label svg, #login form .input-wrap:after { opacity: 0.5; }
+#login form label svg, #login form .input-wrap:after { opacity: 0.6; }
 #login form input:focus, #login form input:active { outline: none; }
-#login form input[type=submit]:hover { opacity: 1 }
 
 ::-webkit-input-placeholder { color: #CCC; }
 :-moz-placeholder { color: #CCC; } /* Firefox 18- */
@@ -341,7 +343,7 @@ nav#menu a:hover {
 
 /* ==============
 	MOBILE: Main
-   ============== */
+	============== */
 
 .main { padding: 30px 0 0 0; }
 .main nav { color: white; padding: 0px 5% 10px; }
@@ -350,19 +352,19 @@ nav#menu a:hover {
 
 /* ===============
 	ALL: IE Fixes
-   =============== */
+	=============== */
 
 .ie7 .title { padding-top: 20px; }
 
 /* ==========================================================================
-   Media Queries
-   ========================================================================== */
+	Media Queries
+	========================================================================== */
 
 @media only screen and (min-width: 480px) {
 
 /* ====================
 	INTERMEDIATE: Menu
-   ==================== */
+	==================== */
 	.nav-container, .main-container { display: none; }
 
 	nav#menu a {
@@ -378,7 +380,7 @@ nav#menu a:hover {
 
 /* ========================
 	INTERMEDIATE: IE Fixes
-   ======================== */
+	======================== */
 
 	nav#menu ul li { display: inline; }
 
@@ -402,11 +404,12 @@ nav#menu a:hover {
 
 	.main-container {
 		display: table-cell;
-		vertical-align: top;
+		vertical-align: middle;
 		border: 1px solid #ACA4A4;
 		border-right: none;
 		background-color: #FFF;
 		border-bottom: 0;
+		position: relative;
 	}
 	.nav-container, .main-container { display: none; }
 
@@ -513,8 +516,8 @@ nav#menu a:hover {
 }
 
 /* ==========================================================================
-   Helper classes
-   ========================================================================== */
+	Helper classes
+	========================================================================== */
 
 .ir {
 	background-color: transparent;

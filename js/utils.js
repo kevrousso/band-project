@@ -1,9 +1,10 @@
 var app = app || {};
 	app.utils = {
-		//@param action: string
-		//@param data: string
-		//@param callback: function
+		//@param action: String
+		//@param data: String
+		//@param callback: Function
 		postData: function(action, data, callback) {
+			data = typeof data === "object" ? JSON.stringify(data) : data;
 			$.ajax({
 				url: 'app.php',
 				type: 'POST',
@@ -12,10 +13,13 @@ var app = app || {};
 					if (callback) {
 						callback(data, textStatus, jqXHR);
 					}
+				},
+				error: function(resp) {
+					console.error("Error: "+resp);
 				}
 			});
 		},
-		//@param views: string or array
+		//@param views: String or Array
 		//@param callback: function
 		loadTemplate: function(views, callback) {
 			var deferreds = [];
@@ -52,6 +56,7 @@ var app = app || {};
 				self.showAlert('Error!', 'An error occurred while uploading ' + file.name, 'alert-error');
 			});
 		},
+		//@param str: String
 		cleanUpSpecialChars: function(str) {
 			return str.replace(/[ÀÁÂÃÄÅ]/g, "A").replace(/[àáâãäå]/g, "a")
 					  .replace(/[ÈÉÊË]/g, "E").replace(/[èéêë]/g, "e")
@@ -60,5 +65,9 @@ var app = app || {};
 					  .replace(/[ÙÚÛŨÜ]/g, "U").replace(/[ùúûũü]/g, "u")
 					  .replace(/[ÝŸ]/g, "Y").replace(/[ýÿ]/g, "y")
 					  .replace(/ /g, "_");
+		},
+		//@param str: String
+		capitalize: function(str) {
+			return str.charAt(0).toUpperCase() + str.slice(1);
 		}
 	}

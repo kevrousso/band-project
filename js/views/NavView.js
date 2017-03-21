@@ -56,15 +56,15 @@ var app = app || {};
 			this.filteredList = new app.FolderList(filtered);
 
 			this.$navContent.hide().html("");
-			this.$spinner.hide();
+			this.$spinner.show().css("display", "table-cell");
 			if ( this.filteredList.length ) {
 				this.filteredList.each(function(folder) {
 					that.$navContent.append( that.template( {item: folder.toJSON()} ) );
 				});
 			}
 			//TODO: maybe make a function toggleSpinner( spinner, $elToShow )
-			this.$spinner.fadeOut(150, function() {
-				that.$navContent.fadeIn("fast");
+			this.$spinner.fadeOut(250, function() {
+				that.$navContent.fadeIn(250);
 			});
 
 			this.updateSearchUI();
@@ -129,7 +129,7 @@ var app = app || {};
 								newFolder = new app.Folder({ id: nextID, name: foldername, machineName: foldername });
 							
 							that.collection.add(newFolder);
-							app.utils.postData("postFolder", JSON.stringify(newFolder.toJSON()));
+							app.utils.postData("postFolder", newFolder.toJSON());
 							that.render();
 						} else {
 							alert("Folder name already exist.")
@@ -142,44 +142,48 @@ var app = app || {};
 						var fileInfo = e.target.files[0],
 							filename = fileInfo.name,
 							fileType = fileInfo.type.split("/")[0];
-						//validate that there isn't already a file with that name in the folder
-						if (that.isFileNameUnique(filename)) {
-								//checks if folder hasContent or defaults to first </a>
-							var folder = that.getModelByName(that.collection.models, name),
-								folderID = folder.get("id"),
-								currentfiles = folder.get("files");
-								//get max id and incremente it by 1 because ids are Unique
-							var nextID = that.getNextModelID(that.files.models);
 
-							if (fileType !== "audio" && fileType !== "video" && fileType !== "image") {
-								fileType = "file";
+						if (fileInfo && fileInfo.size < 10485760) { // 10 MB (this size is in bytes)
+							if (that.isFileNameUnique(filename)) {
+								var folder = that.getModelByName(that.collection.models, name),
+									folderID = folder.get("id"),
+									currentfiles = folder.get("files"),
+									nextID = that.getNextModelID(that.files.models);
+
+								if (fileType !== "audio" && fileType !== "video" && fileType !== "image") {
+									fileType = "file";
+								}
+								var newFile = new app.File({
+									id: nextID,
+									name: filename,
+									machineName: app.utils.cleanUpSpecialChars(filename),
+									folderID: folderID,
+									type: fileType
+								});
+
+								//update files collection
+								that.files.models.push(newFile);
+								currentfiles.push(newFile);
+
+								that.render();
+
+								//can't use this as we need the file to be posted $_FILES
+								//app.utils.postData("postFile", newFile.toJSON());
+
+								that.$formAddFile.find("input[name=fileName]").val(newFile.get("name"));
+								that.$formAddFile.find("input[name=fileMachineName]").val(newFile.get("machineName"));
+								that.$formAddFile.find("input[name=fileFolderID]").val(newFile.get("folderID"));
+								that.$formAddFile.find("input[name=fileType]").val(newFile.get("type"));
+								that.$formAddFile.submit();
+							} else {
+								alert("File already exist in that folder.");
 							}
-							var newFile = new app.File({
-								id: nextID,
-								name: filename,
-								machineName: app.utils.cleanUpSpecialChars(filename),
-								folderID: folderID,
-								type: fileType
-							});
-
-							//update files collection
-							that.files.models.push(newFile);
-							currentfiles.push(newFile);
-
-							that.render();
-
-							//can't use this as we need the file to be posted $_FILES
-							//app.utils.postData("postFile", JSON.stringify(newFile.toJSON()));
-
-							that.$formAddFile.find("input[name=fileName]").val(newFile.get("name"));
-							that.$formAddFile.find("input[name=fileMachineName]").val(newFile.get("machineName"));
-							that.$formAddFile.find("input[name=fileFolderID]").val(newFile.get("folderID"));
-							that.$formAddFile.find("input[name=fileType]").val(newFile.get("type"));
-							that.$formAddFile.submit();
 						} else {
-							alert("File already exist in that folder.");
+							//Prevent default and display error
+							e.preventDefault();
+							alert("File is exceeding max file size of: 10mb.");
 						}
-						//reset the input file so that error message is shown if file is uploaded twice
+						//reset the input file
 						$(this).val("");
 					});
 					this.$formAddFile.find("input").trigger("click");
@@ -199,8 +203,12 @@ var app = app || {};
 
 						that.renameElement(type, name, newName, newMachineName);
 
-						//TODO: add backend renaming
-						app.utils.postData("renameFile", JSON.stringify({id: id, oldName: oldName, newName: newMachineName}));
+						//TODO: test renameFolder()
+						if (type === "folder") {
+							app.utils.postData("renameFolder", {id: id, oldName: oldName, newName: newName, newMachineName: newMachineName});
+						} else if (type === "file") {
+							app.utils.postData("renameFile", {id: id, oldName: oldName, newName: newName, newMachineName: newMachineName});
+						}
 					}
 				break;
 				case "delete":
@@ -213,7 +221,7 @@ var app = app || {};
 						//remove model from collection and RENDER
 						if (type === "folder") {
 							folderModel = that.getModelByName(that.collection.models, name);
-							app.utils.postData("deleteFolder", folderModel.get("machineName"));
+							app.utils.postData("deleteFolder", folderModel.toJSON());
 
 							//TODO: if it contains files....call deleteFile on each
 							//actually, on cascade delete should handle this
@@ -306,24 +314,31 @@ var app = app || {};
 				data: {action: 'getFolders'},
 				type: "POST",
 				success: function(model, response) {
-					//merge the files in folders, matching folder.id -> file.folderID
-					that.collection.each(function(folder, index) {
-						that.files.each(function(file, index) {
-							var associatedFile = that.files.filter(function(file) {
-								return folder.id === file.get("folderID");
+					if (that.collection) {
+						//merge the files in folders, matching folder.id -> file.folderID
+						that.collection.each(function(folder, index) {
+							that.files.each(function(file, index) {
+								var associatedFile = that.files.filter(function(file) {
+									return folder.id === file.get("folderID");
+								});
+								folder.set("files", associatedFile);
 							});
-							folder.set("files", associatedFile);
 						});
-					});
-					//createFilters
-					that.$types.append(that._createFilters());
-					if (!window.location.hash) {
-						that.render();
-					}
-					if (!Backbone.History.started) {
-						//make sure links gets registered by the router
-						AppRouter = new app.Router();
-						Backbone.history.start();
+						//createFilters
+						that.$types.append(that._createFilters());
+						//do not render if we have a route
+						if (!window.location.hash) {
+							that.render();
+						}
+
+						if (!Backbone.History.started) {
+							//make sure links gets registered by the router
+							AppRouter = new app.Router();
+							Backbone.history.start();
+						}
+					} else {
+						this.$spinner.hide();
+						this.$navContent.show().html("No directories to display");
 					}
 				}
 			});
@@ -362,7 +377,8 @@ var app = app || {};
 				} else {
 					$this.parent().toggleClass("selected");
 				}
-				this.trigger("change:updateViewArea", {src: src, type: type} );
+				var file = this.getModelByName(this.files.models, $this.text());
+				this.trigger("change:updateViewArea", {fileID: file.id, src: src, type: type} );
 			}
 		},
 		/*Filter events*/
