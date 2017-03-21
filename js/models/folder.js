@@ -1,11 +1,10 @@
  var app = app || {};
 
 	app.Folder = Backbone.Model.extend({
-
 		defaults: {
-			title: 'Folder name'
-		},
-		initialize: function () {
+			id: 0,
+			name: 'Folder name',
+			machineName: 'Folder_Name',
+			files: {}
 		}
-
 	});

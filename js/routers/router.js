@@ -1,9 +1,10 @@
 
 app.Router = Backbone.Router.extend({
 	routes:{
-		'file/:path': 'setFilter'
+		'file/:path': 'urlNav',
+		'filter/:type': 'setFilter'
 	},
-	setFilter: function( path ) {
+	urlNav: function( path ) {
 		// Set the current filter to be used
 		/*if (path) {
 			path = path.trim();
@@ -11,5 +12,9 @@ app.Router = Backbone.Router.extend({
 		//app.FolderRoute = folder + "/" + file || '';
 		$('a[href$="'+ path +'"]').closest("li.dir").find("a.hasContent").trigger("click", true);
 		$('a[href$="'+ path +'"]').trigger("click", true);
+	},
+	setFilter: function( type ) {
+		NavView.filterType = type;
+		NavView.trigger('change:filterType');
 	}
 });

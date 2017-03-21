@@ -1,0 +1,18 @@
+<li class="dir">
+<% if (item.files.length > 0) { %>
+	<a href="#<%=item.name%>" class="hasContent"><span class="folder"></span> <%=item.name%> </a>
+	<ul class="content">
+<%
+	_.each(item.files, function(val, key) {
+%>
+		<li class="file">
+			<a href="#file/<%=val.get('path')%>" class="<%=val.get('type')%>"><svg class="icon icon-<%=val.get('type')%>" viewBox="0 0 15 15"><use xlink:href="#icon-<%=val.get('type')%>"></use></svg><%=val.get('name')%></a>
+		</li>
+<% 
+	});
+%>
+	</ul>
+<% } else { %>
+	<a href="#<%=item.name%>"><span class="folder"></span><%=item.name%></a>
+<% } %>
+</li>

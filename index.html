@@ -16,6 +16,8 @@
 		<link rel="stylesheet" href="css/jquery-ui.css">
 		<link rel="stylesheet" href="css/base.css">
 
+		<link rel="stylesheet" href="css/jquery.contextMenu.css">
+
 		<!--[if lt IE 9]>
 			<script src="js/vendor/html5-3.6-respond-1.1.0.min.js"></script>
 		<![endif]-->
@@ -56,8 +58,31 @@
 		</div>
 		<div id="container">
 			<div class="nav-container">
-				<nav id="navContent">
-					<ul>
+				<div id="filters">
+					<div id="filter-search">
+						<div id="search">
+							<span class="searchInput">
+								<input type="text" id="searchBox" placeholder="Search...">
+								<span class="clear" style="display: none;"></span>
+							</span>
+						</div>
+					</div>
+					<div id="filter-type">
+						<h3>Filter:</h3>
+						<div id="types">
+							<!--to be populated by app-->
+						</div>
+					</div>
+				</div>
+				<div class="spinner">
+					<div class="rect1"></div>
+					<div class="rect2"></div>
+					<div class="rect3"></div>
+					<div class="rect4"></div>
+					<div class="rect5"></div>
+				</div>
+				<nav id="navLeft">
+					<ul id="navContent">
 						<!--to be populated by app-->
 					</ul>
 				</nav>
@@ -88,6 +113,13 @@
 							</div>
 						</div>
 					</div>
+					<div class="spinner">
+						<div class="rect1"></div>
+						<div class="rect2"></div>
+						<div class="rect3"></div>
+						<div class="rect4"></div>
+						<div class="rect5"></div>
+					</div>
 					<form action="" class="addComment">
 						<input type="text" name="username" placeholder="Enter your name">
 						<br>
@@ -107,15 +139,21 @@
 
 		<script src="js/lib/jquery-1.11.0.min.js"></script>
 		<script src="js/lib/jquery-ui-1.10.4.min.js"></script>
+		<script src="js/lib/jquery.highlight.js"></script>
 		<script src="js/lib/underscore-min.js"></script>
 		<script src="js/lib/backbone-min.js"></script>
 		<script src="js/lib/backbone.localStorage.js"></script>
 
+		<script src="js/lib/jquery.contextMenu.js"></script>
+		
 		<script src="js/utils.js"></script>
 
+		<script src="js/models/file.js"></script>
 		<script src="js/models/folder.js"></script>
+		<script src="js/collections/fileList.js"></script>
 		<script src="js/collections/folderList.js"></script>
-		<script src="js/views/folderView.js"></script>
+		<script src="js/views/AppView.js"></script>
+		<script src="js/views/NavView.js"></script>
 		<script src="js/routers/router.js"></script>
 		<script src="js/app.js"></script>
 	</body>

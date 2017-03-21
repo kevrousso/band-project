@@ -1,5 +1,5 @@
  var app = app || {};
 
 $(function() {
-	new app.FolderView({router: app.Router});
+	new app.AppView({router: app.Router});
 });
