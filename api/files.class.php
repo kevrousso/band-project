@@ -1,11 +1,13 @@
 <?php 
 require_once 'database.class.php';
+require_once 'utils.class.php';
 
 class Files {
 	private $db;
 
 	public function __construct($db) {
 		$this->db = $db;
+		$this->utils = new Utils();
 
 		if (isset($_POST['action']) && !empty($_POST['action'])) {
 			$action = $_POST['action'];
@@ -54,13 +56,15 @@ class Files {
 				$this->db->bind(':pathToFile', $pathToFile);
 				$this->db->execute();
 			} else {
-				echo 'An error occured while the file was being uploaded. '
+				$this->utils->error = 'An error occured while the file was being uploaded. '
 					. 'Error code: '. intval($_FILES['uploaded_file']['error']);
+				$this->utils->updateMessages();				
 			}
 		 
 			header('Location: index.html');
 		} else {
-			echo 'Error! A file was not sent!';
+			$this->utils->error = 'Error! A file was not sent!';
+			$this->utils->updateMessages();
 		}
 	}
 	public function renameFile() {

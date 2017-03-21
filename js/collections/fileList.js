@@ -4,7 +4,7 @@ var app = app || {};
 		// Reference to this collection's model.
 		model: app.File,
 		//url: "filesOutput.json",				//test without DB
-		url: "app.php",
+		url: "api/app.php",
 		parse: function(response) {
 			return _.map(response, function(item, index) {
 				return {

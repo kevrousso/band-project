@@ -11,10 +11,10 @@ class Conversations {
 			$action = $_POST['action'];
 			switch($action) {
 				case 'getConversations': $this->getConversations(); break;
-				case 'postMessage': 
+				case 'postComment': 
 				if (isset($_POST['_data']) && !empty($_POST['_data'])) {
 					$data = json_decode($_POST["_data"]);
-					$this->postMessage($data);
+					$this->postComment($data);
 				}
 				break;
 			}
@@ -29,24 +29,24 @@ class Conversations {
 		echo json_encode($convos);
 	}
 
-	public function postMessage($data) {
+	public function postComment($data) {
 		$username = $data->username;
 		$fileID = $data->fileID;
-		$message = $data->message;
+		$comment = $data->comment;
 
-		$this->db->query('INSERT INTO conversations (username, file_id, message, timestamp) 
-											VALUES (:username, :file_id, :message, NOW())');
+		$this->db->query('INSERT INTO conversations (username, file_id, comment, timestamp) 
+											VALUES (:username, :file_id, :comment, TIME_FORMAT(NOW(), "%H:%i"))');
 		$this->db->bind(":username", $username);
 		$this->db->bind(":file_id", $fileID);
-		$this->db->bind(":message", $message);
+		$this->db->bind(":comment", $comment);
 		$this->db->execute();
 
 		//return row
 		$this->db->query('SELECT * FROM conversations WHERE id = :id');
 		$this->db->bind(":id", $this->db->lastInsertID());
 		$convo = $this->db->single();
+		$convo["timestamp"] = date("H:i", strtotime($convo["timestamp"]));
 		echo json_encode($convo);
-	
 	}
 }
 ?>

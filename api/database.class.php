@@ -1,6 +1,7 @@
 <?php 
 //Took from: http://culttt.com/2012/10/01/roll-your-own-pdo-php-class/
 require_once 'config.php';
+require_once 'utils.class.php';
 
 class Database {
 	private $host = DB_HOST;
@@ -9,9 +10,10 @@ class Database {
 	private $dbname = DB_NAME;
 
 	private $dbh;
-	private $error;
 
 	public function __construct() {
+		$this->utils = new Utils();
+
 		// Set DSN
 		$dsn = 'mysql:host=' . $this->host . ';dbname=' . $this->dbname;
 		// Set options
@@ -24,12 +26,12 @@ class Database {
 			$this->dbh = new PDO($dsn, $this->user, $this->pass, $options);
 		}
 		catch(PDOException $e) {
-			$this->error = $e->getMessage();
+			$this->utils->error = $e->getMessage();
+			$this->utils->updateMessages();
 		}
 	}
 
 	public function query($query) {
-		//error? stm is not defined as variable at top of class?
 		$this->stmt = $this->dbh->prepare($query);
 	}
 	public function bind($param, $value, $type = null) {
@@ -51,8 +53,15 @@ class Database {
 		$this->stmt->bindValue($param, $value, $type);
 	}
 	//Used to check if Insert worked also
+	//if ($this->db->execute()) { ... }
 	public function execute() {
-		return $this->stmt->execute();
+		try {
+			return $this->stmt->execute();
+		}
+		catch(PDOException $e) {
+			$this->utils->error = $e->getMessage();
+			$this->utils->updateMessages();
+		}
 	}
 	public function resultSet() {
 		$this->execute();

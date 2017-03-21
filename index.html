@@ -20,6 +20,8 @@
 		<link rel="stylesheet" href="css/base.css">
 
 		<link rel="stylesheet" href="css/jquery.contextMenu.css">
+		<link rel="stylesheet" href="css/perfect-scrollbar.min.css">
+
 
 		<!--[if lt IE 9]>
 		<script src="js/vendor/html5-3.6-respond-1.1.0.min.js"></script>
@@ -80,6 +82,8 @@
 								<div class="rect4"></div>
 								<div class="rect5"></div>
 							</div>
+							<div class="invalid"></div>
+							<div class="warning"></div>
 							<div class="input-wrap">
 								<label for="username">
 									<svg class="icon icon-username" viewBox="0 0 15 15">
@@ -100,8 +104,6 @@
 								<label for="rememberMe">Remember Me</label>
 								<input type="checkbox" value="" name="rememberMe" id="rememberMe">
 							</div>
-							<div class="invalid"></div>
-							<div class="warning"></div>
 							<input type="submit" value="LOG IN">
 						</form>
 					</div>
@@ -132,11 +134,11 @@
 							<div class="rect5"></div>
 						</div>
 						<nav id="navLeft">
-							<ul id="navContent">
+							<ul id="navContent" class="scrollable">
 								<!--to be populated by app-->
 							</ul>
 						</nav>
-						<form id="upload" method="POST" action="app.php" enctype="multipart/form-data">
+						<form id="upload" method="POST" action="api/pp.php" enctype="multipart/form-data">
 							<input type="hidden" name="action" value="postFile">
 							<input type="hidden" name="fileName">
 							<input type="hidden" name="fileMachineName">
@@ -149,66 +151,24 @@
 						<div class="main wrapper clearfix">
 							<div id="mainContent">
 								<h3 class='noSelection'>Select a file in the menu or upload one using the right-click context menu on the menu.</h3>
+								<div class="spinner">
+									<div class="rect1"></div>
+									<div class="rect2"></div>
+									<div class="rect3"></div>
+									<div class="rect4"></div>
+									<div class="rect5"></div>
+								</div>
 								<div id="data"></div>
-								<div id="comments">
-									<!--<div id="userID_123" class="comment">
-										<span class="user">
-											<span class="name">User 1</span>
-											<svg class="icon-user" viewBox="0 0 15 15">
-												<use xlink:href="#icon-user"></use>
-											</svg>
-										</span>
-										<p>
-											Lorem ipsum dolor sit amet,
-											<a href="#2:45" class="timestamp">2:45</a>
-											adipisicing elit, sed do eiusmod
-										</p>
-									</div>
-									<div id="userID_124" class="comment">
-										<span class="user">
-											<span class="name">User 2</span>
-											<svg class="icon-user" viewBox="0 0 15 15">
-												<use xlink:href="#icon-user"></use>
-											</svg>
-										</span>
-										<p>
-											Lorem ipsum
-											<a href="#0:26" class="timestamp">0:26</a>
-											sit amet, consectetur adipisicing elit, sed do eiusmod
-								tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-								quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
-										</p>
-									</div>
-									<div id="userID_125" class="comment">
-										<span class="user">
-											<span class="name">User 3</span>
-											<svg class="icon-user" viewBox="0 0 15 15">
-												<use xlink:href="#icon-user"></use>
-											</svg>
-										</span>
-										<p>
-											Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
-								tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-								quis nostrud exercitation
-											<a href="#1:13" class="timestamp">1:13</a>
-											laboris nisi ut aliquip ex ea commodo
-								consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
-								cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
-								proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-										</p>
-									</div>-->
+								<div class="scrollable">
+									<div id="comments"></div>
+									
+									<form action="" method="POST" id="addComment">
+										<textarea name="usercomment" id="comment" rows="5" placeholder="Enter your comment" maxlength="500"></textarea>
+										<input id="submitComment" type="submit" value="Send comment">
+									</form>
 								</div>
 							</div>
-							<div class="spinner">
-								<div class="rect1"></div>
-								<div class="rect2"></div>
-								<div class="rect3"></div>
-								<div class="rect4"></div>
-								<div class="rect5"></div>
-							</div>
-							<form action="" method="POST" id="addComment">
-								<textarea name="usercomment" id="comment" rows="5" placeholder="Enter your message"></textarea>
-								<input id="submitComment" type="submit" value="Send message"></form>
+
 						</div>
 					</div>
 				</div>
@@ -230,6 +190,7 @@
 		<script src="js/lib/backbone.localStorage.js"></script>
 		<script src="js/lib/jquery.highlight.js"></script>
 		<script src="js/lib/jquery.contextMenu.js"></script>
+		<script src="js/lib/perfect-scrollbar.min.js"></script>
 
 		<script src="js/utils.js"></script>
 

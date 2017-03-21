@@ -19,7 +19,7 @@ class User {
 	}
 
 	public function getUsername() {
-		if (!empty($_SESSION["username"]) && !isset($_SESSION["username"])) {
+		if (!empty($_SESSION["username"]) && isset($_SESSION["username"])) {
 			$this->username = $_SESSION["username"];
 			return $this->username;
 		} elseif (isset($_COOKIE['login_info'])) {
@@ -30,7 +30,7 @@ class User {
 			return $this->username;
 		}
 	}
-	/*TODO: not sure that those are very useful...since we can just call: $this->user->username*/
+	/*TODO: not sure that those are very useful...since we can just call: $this->user->auth_key*/
 	public function getAuthKey()  { return $this->auth_key; }
 
 	public function getSalt() {
@@ -43,6 +43,12 @@ class User {
 	public function getOnlineUsers() {
 		$this->db->query('SELECT * FROM users WHERE status = "online"');
 		return $this->db->resultSet();
+	}
+
+	public function getUserStatus() {
+		$this->db->query('SELECT status FROM users WHERE name = :name');
+		$this->db->bind(":name", $this->username);
+		return $this->db->single();
 	}
 
 	public function getUserInfo($name) {

@@ -8,26 +8,35 @@ class UserTools {
 	private $db;
 	private $auth;
 	private $user;
+	private $utils;
 
 	public function __construct($db, $auth, $user) {
 		$this->db = $db;
 
 		$this->user = $user;
 		$this->auth = $auth;
+		$this->utils = new Utils();
 
 		if (isset($_POST['action']) && !empty($_POST['action'])) {
 			$action = $_POST['action'];
 			switch($action) {
-				case 'createUser': 	$this->createUser();  break;
+				case 'createUser': 	$this->createUser();   break;
 				/*Not tested yet*/
-				case 'update': 	   $this->update();	    break;
+				case 'update': 	   $this->update();	     break;
 				/*Not tested yet*/
-				case 'delete': 	   $this->delete();	    break;
+				case 'delete': 	   $this->delete();	     break;
+				case 'updateStatus':
+					if (isset($_POST["_data"]) && !empty($_POST["_data"]) ) {
+						$data = json_decode($_POST["_data"]);
+						$this->updateStatus($data->status);
+					}
+				break;
 			}
 		}
 	}
 
 	public function updateAuthKey() {
+		$this->user->username = $this->user->getUsername();
 		$this->db->query('UPDATE users SET auth_key = :auth_key WHERE name = :username');
 		$this->db->bind(':username', $this->user->username);
 		$this->db->bind(':auth_key', $this->user->auth_key);
@@ -35,10 +44,15 @@ class UserTools {
 	}
 
 	public function updateStatus($status) {
-		$this->db->query('UPDATE users SET status = :status WHERE name = :username');
-		$this->db->bind(':username', $this->user->username);
-		$this->db->bind(':status', $status);
-		$this->db->execute();
+		$this->user->username = $this->user->getUsername();
+		if ($this->user->getUserStatus() != $status) {
+			$this->db->query('UPDATE users SET status = :status WHERE name = :username');
+			$this->db->bind(':username', $this->user->username);
+			$this->db->bind(':status', $status);
+			$this->db->execute();
+		} else {
+			echo 'Status not updated';
+		}
 	}
 
 	// Update an existing user's password
@@ -53,14 +67,14 @@ class UserTools {
 				$this->db->bind(":password", $this->user->password);
 
 				if ($this->db->single()) {
-					$this->auth->msg = 'Your password has been changed successfully.';
+					$this->utils->msg = 'Your password has been changed successfully.';
 				} else {
-					$this->auth->error = 'Something went wrong. Please, try again later.';
+					$this->utils->error = 'Something went wrong. Please, try again later.';
 				}
 			}
 		}
 		
-		$this->auth->updateMessages();
+		$this->utils->updateMessages();
 	}
 
 	//shown only once to users
@@ -76,8 +90,8 @@ class UserTools {
 		$this->user->password = $this->hashData($rawPass);
 
 		if ($this->usernameExist()) {
-			$this->auth->error = 'Username already exists.';
-			$this->auth->updateMessages();
+			$this->utils->error = 'Username already exists.';
+			$this->utils->updateMessages();
 		} else {
 			$this->db->query('INSERT INTO users (name, password, salt, auth_key, status) 
 												VALUES (:username, :password, :salt, :auth_key, :status)');
@@ -88,7 +102,7 @@ class UserTools {
 			$this->db->bind(':status', "");
 			$this->db->execute();
 
-			$this->auth->error = "";
+			$this->utils->error = "";
 		}
 	}
 

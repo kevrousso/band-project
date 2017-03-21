@@ -5,7 +5,7 @@
 			id: 0,
 			fileID: 0,
 			username: "",
-			message: "",
+			comment: "",
 			timestamp: ""
 		}
 	});
