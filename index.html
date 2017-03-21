@@ -77,13 +77,13 @@
 					<div id="login">
 						<h1 class="bandname">innervate</h1>
 						<form action="index.html" method="POST" autocomplete="off">
-							<div class="spinner">
+							<!-- <div class="spinner">
 								<div class="rect1"></div>
 								<div class="rect2"></div>
 								<div class="rect3"></div>
 								<div class="rect4"></div>
 								<div class="rect5"></div>
-							</div>
+							</div> -->
 							<div class="invalid"></div>
 							<div class="warning"></div>
 							<div class="input-wrap">
@@ -116,7 +116,7 @@
 							<div id="filter-search">
 								<div id="search">
 									<span class="searchInput">
-										<input type="text" id="searchBox" placeholder="Search...">
+										<input type="text" id="searchBox" placeholder="Search for file name...">
 										<span class="clear" style="display: none;"></span>
 									</span>
 								</div>
@@ -128,20 +128,20 @@
 								</div>
 							</div>
 						</div>
-						<div class="spinner">
+						<!-- <div class="spinner">
 							<div class="rect1"></div>
 							<div class="rect2"></div>
 							<div class="rect3"></div>
 							<div class="rect4"></div>
 							<div class="rect5"></div>
-						</div>
+						</div> -->
 						<h4 class="noDirectories">No directories to display</h4>
 						<nav id="navLeft">
 							<ul id="navContent" class="scrollable">
 								<!--to be populated by app-->
 							</ul>
 						</nav>
-						<form id="upload" method="POST" action="api/app.php" enctype="multipart/form-data">
+						<form id="upload" method="POST" action="" enctype="multipart/form-data">
 							<input type="hidden" name="action" value="postFile">
 							<input type="hidden" name="fileName">
 							<input type="hidden" name="fileMachineName">
@@ -154,21 +154,35 @@
 					<div class="main-container">
 						<div class="main wrapper clearfix">
 							<div id="mainContent">
-								<div class="spinner">
+								<!-- <div class="spinner">
 									<div class="rect1"></div>
 									<div class="rect2"></div>
 									<div class="rect3"></div>
 									<div class="rect4"></div>
 									<div class="rect5"></div>
-								</div>
+								</div> -->
 								<div id="data"></div>
-								<div class="scrollable">
-									<div id="comments"></div>
-									
+								<div class="content">
 									<form action="" method="POST" id="addComment">
-										<textarea name="usercomment" id="comment" rows="2" placeholder="Enter your comment" maxlength="500"></textarea>
+										<span class="user-icon">
+											<svg class="icon-user" viewBox="0 0 15 15">
+												<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#icon-user"></use>
+											</svg>
+										</span>
+										<div class="addCommentArea">
+											<textarea name="usercomment" id="comment" rows="2" placeholder="Enter your comment" maxlength="500"></textarea>
+											<span class="countDown"></span>
+											<div class="enterToSendArea">
+												<label for="enterToSend">Press Enter to send</label>
+												<input id="enterToSend" type="checkbox" checked="checked" value="Press Enter to send"/>
+											</div>
+										</div>
+
 										<input id="submitComment" type="submit" value="Send">
 									</form>
+									<div class="scrollable">
+										<div id="comments"></div>
+									</div>
 								</div>
 							</div>
 
@@ -193,8 +207,10 @@
 		<script src="js/libs/backbone.localStorage.js"></script>
 		<script src="js/libs/jquery.highlight.js"></script>
 		<script src="js/libs/jquery.contextMenu.js"></script>
+		<script src="js/libs/jquery.fileupload.js"></script>
 		<script src="js/libs/perfect-scrollbar.min.js"></script>
 		<script src="js/libs/bootbox.min.js"></script>
+		<script src="js/libs/jquery.blockUI.js"></script>
 
 		<script src="js/utils.js"></script>
 

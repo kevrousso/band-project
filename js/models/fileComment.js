@@ -6,6 +6,6 @@
 			fileID: 0,
 			username: "",
 			comment: "",
-			timestamp: ""
+			datetime: ""
 		}
 	});

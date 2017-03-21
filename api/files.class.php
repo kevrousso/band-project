@@ -24,9 +24,9 @@ class Files {
 	}
 
 	public function getFiles() {
-		$this->db->query('SELECT * FROM files ORDER BY name');
+		$this->db->query('SELECT * FROM files ORDER BY id');
 		$files = $this->db->resultSet();
-		echo json_encode($files);
+		echo json_encode($files, JSON_NUMERIC_CHECK);
 	}
 	public function postFile() {
 		if ( isset($_FILES['uploaded_file']) ) {
@@ -48,7 +48,7 @@ class Files {
 				move_uploaded_file($tmp_name, "../".$pathToFile);
 				
 				$this->db->query('INSERT INTO files (
-						name, machine_name, folder_id, type, path, date_created
+						name, machineName, folderID, type, path, dateCreated
 					) VALUES (
 						:fileName, :fileMachineName, :folderID, :fileType, :pathToFile, NOW()
 					)'
@@ -59,16 +59,27 @@ class Files {
 				$this->db->bind(':fileType', $fileType);
 				$this->db->bind(':pathToFile', $pathToFile);
 				$this->db->execute();
+
+				//return row
+				$this->db->query('SELECT * FROM files WHERE id = :id');
+				$this->db->bind(":id", $this->db->lastInsertID());
+				$file = $this->db->single();
+				echo json_encode($file, JSON_NUMERIC_CHECK);
 			} else {
-				$this->utils->error = 'An error occured while the file was being uploaded. '
+				$max_upload = $this->getMaxFileSizeUpload();
+				if ($_FILES['uploaded_file']['size'] == 0) {
+					$this->utils->error = 'Error code: '. intval($_FILES['uploaded_file']['error']) .
+						'<br />Unable to upload file. Uploaded file size is greater than the max file size upload of ' . $max_upload . 'MB.';
+				} else {
+					//throw generic error
+					$this->utils->error = 'An error occured while the file was being uploaded. '
 					. 'Error code: '. intval($_FILES['uploaded_file']['error']);
-				$this->utils->updateMessages();				
+				}
+				$this->utils->sendLogInfos();				
 			}
-		 
-			header('Location: ../index.html');
 		} else {
 			$this->utils->error = 'Error! A file was not sent!';
-			$this->utils->updateMessages();
+			$this->utils->sendLogInfos();
 		}
 	}
 	public function renameFile() {
@@ -81,7 +92,7 @@ class Files {
 		$folderID = $data->folderID;
 
 
-		$this->db->query('UPDATE files SET name = :name, machine_name = :machineName, path = REPLACE(path, :oldMachineName, :newMachineName) WHERE id = :fileID');
+		$this->db->query('UPDATE files SET name = :name, machineName = :machineName, path = REPLACE(path, :oldMachineName, :newMachineName) WHERE id = :fileID');
 		$this->db->bind(':name', $newName);
 		$this->db->bind(':machineName', $newMachineName);
 		$this->db->bind(':oldMachineName', $oldMachineName);	
@@ -90,11 +101,11 @@ class Files {
 		$this->db->execute();
 
 		//get correct folder name based on folder id
-		$this->db->query('SELECT machine_name FROM folders WHERE id = :folderID');
+		$this->db->query('SELECT machineName FROM folders WHERE id = :folderID');
 		$this->db->bind(':folderID', $folderID);
 		$row = $this->db->single();
 
-		$folderMachineName = $row['machine_name'];
+		$folderMachineName = $row['machineName'];
 
 		$oldPath = UPLOAD_DIR."/".$folderMachineName."/".$oldMachineName;
 		$newPath = UPLOAD_DIR."/".$folderMachineName."/".$newMachineName;
@@ -105,7 +116,7 @@ class Files {
 			'newMachineName' => $newMachineName,
 			'path' => $newPath
 		);
-		echo json_encode($file);
+		echo json_encode($file, JSON_NUMERIC_CHECK);
 
 		//rename in directory uploads
 		$renamed = rename("../".$oldPath, "../".$newPath);
@@ -116,8 +127,8 @@ class Files {
 		$fileMachineName = $data->fileMachineName;
 		$folderMachineName = $data->folderMachineName;
 
-		$this->db->query("DELETE FROM files WHERE machine_name = :fileMachineName");
-		$this->db->bind(':fileMachineName', $fileMachineName);
+		$this->db->query("DELETE FROM files WHERE id = :fileID");
+		$this->db->bind(':fileID', $fileID);
 		$this->db->execute();
 
 		$this->fileComments->deleteFileComments($fileID);
@@ -126,6 +137,14 @@ class Files {
 
 		//delete file in directory
 		unlink($pathToFile);
+	}
+
+	public function getMaxFileSizeUpload() {
+		$max_upload = (int)(ini_get('upload_max_filesize'));
+		$max_post = (int)(ini_get('post_max_size'));
+		$memory_limit = (int)(ini_get('memory_limit'));
+		$upload_mb = min($max_upload, $max_post, $memory_limit);
+		return $upload_mb;
 	}
 }
 ?>

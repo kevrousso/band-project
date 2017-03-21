@@ -22,7 +22,8 @@ class Folders {
 	public function getFolders() {
 		$this->db->query('SELECT * FROM folders ORDER BY name');
 		$this->db->execute();
-		echo json_encode($this->db->resultSet());
+		$folders = $this->db->resultSet();
+		echo json_encode($folders, JSON_NUMERIC_CHECK);
 	}
 	public function postFolder() {
 		$newFolder = json_decode($_POST["_data"]);
@@ -31,10 +32,16 @@ class Folders {
 		$folderName = $newFolder->name;
 		$folderMachineName = $newFolder->machineName;
 
-		$this->db->query('INSERT INTO folders (name, machine_name) VALUES (:folderName, :folderMachineName)');
+		$this->db->query('INSERT INTO folders (name, machineName) VALUES (:folderName, :folderMachineName)');
 		$this->db->bind(':folderName', $folderName);
 		$this->db->bind(':folderMachineName', $folderMachineName);
 		$this->db->execute();
+
+		//return row
+		$this->db->query('SELECT * FROM folders WHERE id = :id');
+		$this->db->bind(":id", $this->db->lastInsertID());
+		$folder = $this->db->single();
+		echo json_encode($folder, JSON_NUMERIC_CHECK);
 
 		//create folder Dir if not exist
 		mkdir("../".UPLOAD_DIR."/".$folderMachineName);
@@ -49,14 +56,14 @@ class Folders {
 		$newName = $data->newName;
 		$id = $data->id;
 
-		$this->db->query('UPDATE folders SET name = :name, machine_name = :machineName WHERE id = :id');
+		$this->db->query('UPDATE folders SET name = :name, machineName = :machineName WHERE id = :id');
 		$this->db->bind(':name', $newName);
 		$this->db->bind(':machineName', $newMachineName);
 		$this->db->bind(':id', $id);
 		$this->db->execute();
 
 		//replace old folder name by new one
-		$this->db->query('UPDATE files SET path = REPLACE(path, :oldMachineName, :newMachineName) WHERE folder_id = :id');
+		$this->db->query('UPDATE files SET path = REPLACE(path, :oldMachineName, :newMachineName) WHERE folderID = :id');
 		$this->db->bind(':oldMachineName', $oldMachineName);	
 		$this->db->bind(':newMachineName', $newMachineName);
 		$this->db->bind(':id', $id);
@@ -76,12 +83,12 @@ class Folders {
 		$files = $data->files;
 
 		//delete folder
-		$this->db->query('DELETE FROM folders WHERE machine_name = :machineName');
-		$this->db->bind(':machineName', $machineName);
+		$this->db->query('DELETE FROM folders WHERE id = :id');
+		$this->db->bind(':id', $id);
 		$this->db->execute();
 
 		//delete files referencing to that folder
-		$this->db->query('DELETE FROM files WHERE folder_id = :id');
+		$this->db->query('DELETE FROM files WHERE folderID = :id');
 		$this->db->bind(':id', $id);
 		$this->db->execute();
 

@@ -8,17 +8,25 @@ app.AppView = Backbone.View.extend({
 	initialize: function () {
 		var that = this;
 
+		config = app.Config;
+		utils = app.Utils;
+
+		//disable blockUI default css
+		$.blockUI.defaults.css = {};
+
 		this.$headerContainer = this.$el.find('.header-container');
 		this.$container = this.$el.find("#container");
 		this.$footerContainer = $('.footer-container');
 
 		AppRouter = new app.Router();
-		LoginView = new app.LoginView();
+		LoginView = new app.LoginView({
+			appView: this
+		});
 
 		//set proper heights on init
 		this.resize();
 
-		this.loadThemeCSS(app.Config.theme);
+		this.loadThemeCSS(config.theme);
 
 		$(window).on("resize", _.bind(this.resize, this));
 		$(window).bind("beforeunload", this.updateStatus);
@@ -31,7 +39,7 @@ app.AppView = Backbone.View.extend({
 		this.$container.css("min-height", newHeight);
 	},
 	logout: function() {
-		app.utils.postData("logout", {}, function(data, textStatus, jqXHR) {
+		utils.postData("logout", {}, function(data, textStatus, jqXHR) {
 			if (textStatus === "success") {
 				window.location = "index.html";
 			}
@@ -39,10 +47,10 @@ app.AppView = Backbone.View.extend({
 	},
 	//triggered when user closes tab/window
 	updateStatus: function() {
-		app.utils.postData("updateStatus", {status: "offline"});
+		utils.postData("updateStatus", {status: "offline"});
 	},
 	loadThemeCSS: function(href) {
-		if (app.Config.theme !== "") {
+		if (config.theme !== "") {
 			//append theme to page
 			$("head").append("<link rel='stylesheet' type='text/css' href='"+ href +"' />");
 		}

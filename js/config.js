@@ -13,7 +13,17 @@ app.Config = {
 	//width in %.
 	max_width_for_nav_view: 50,
 
-	//maybe just "../css/theme1.css" | "../css/theme2.css"...
-	theme: ""
+	//TODO: maybe just "../css/theme1.css" | "../css/theme2.css"...
+	theme: "",
 
+	accepted_file_extensions: [
+		//images
+		"jpg", "jpeg", "png", "bmp", "gif",
+		//audios
+		"mp3", "wav", "mid",
+		//videos
+		"mp4",
+		//files
+		"txt", "doc", "rtf", "docx", "gp3", "gp4", "gp5", "gp6"
+	]
 }

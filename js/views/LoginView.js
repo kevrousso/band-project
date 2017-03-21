@@ -5,8 +5,14 @@ app.LoginView = Backbone.View.extend({
 	events: {
 		"submit form": "login"
 	},
-	initialize: function () {
+	initialize: function (options) {
 		var that = this;
+
+		config = app.Config;
+		utils = app.Utils;
+
+		this.appView = options.appView;
+
 		this.$form = this.$el.find('form');
 		this.$username = this.$form.find("#username");
 		this.$password = this.$form.find("#password");
@@ -14,7 +20,6 @@ app.LoginView = Backbone.View.extend({
 		this.$submitBtn = this.$form.find("input[type=submit]");
 		this.$warning = this.$form.find(".warning");
 		this.$invalid = this.$form.find(".invalid");
-		this.$spinner = this.$el.find(".spinner");
 
 		this.isLogged();
 		
@@ -22,11 +27,14 @@ app.LoginView = Backbone.View.extend({
 	},
 	isLogged: function() {
 		var that = this;
-		app.utils.postData("isLogged", {}, function(data, textStatus, jqXHR) {
-			if (data) {
+		utils.postData("isLogged", {}, function(username, textStatus, jqXHR) {
+			if (username) {
 				//init Navigation View
-				NavView = new app.NavView();
-				FileCommentsView = new app.FileCommentsView({user: data});
+				NavView = new app.NavView({
+					appView: that.appView,
+					user: username
+				});
+				FileCommentsView = new app.FileCommentsView({user: username});
 			} else {
 				//not logged-in, show the form
 				that.$el.show();
@@ -36,32 +44,33 @@ app.LoginView = Backbone.View.extend({
 	},
 	login: function() {
 		var that = this,
-			username = this.$username.val(),
+			username = $.trim(escape(this.$username.val())),
 			password = this.$password.val(),
 			rememberMe = this.$rememberMe.is(":checked");
 
 		this.$invalid.fadeOut('fast');
-		//TODO: updateSpinner()
-		this.$spinner.fadeIn("fast", function() {
-			app.utils.postData("login", {username: username, password: password, rememberMe: rememberMe}, 
-				function(data, textStatus, jqXHR) {
-					that.$spinner.fadeOut("slow", function() {
-						if (app.utils.isJson(data)) {
-							data = JSON.parse(data);
-						}
-						if (!data.error) {
-							that.$el.fadeOut(250, function() {
-								//init Navigation View
-								NavView = new app.NavView();
-								FileCommentsView = new app.FileCommentsView({user: data});
-							});
-						} else {
-							that.updateMessage(data);
-						}
+		
+		utils.showLoadingBox();
+
+		utils.postData("login", {username: username, password: password, rememberMe: rememberMe}, 
+			function(response, textStatus, jqXHR) {
+				utils.hideLoadingBox();
+
+				response = utils.isJSON(response) ? JSON.parse(response) : response;
+				if (!response.error) {
+					that.$el.fadeOut(250, function() {
+						//init Navigation View
+						NavView = new app.NavView({
+							appView: that.appView,
+							user: response
+						});
+						FileCommentsView = new app.FileCommentsView({user: response});
 					});
+				} else {
+					that.updateMessage(response);
 				}
-			);
-		});
+			}
+		);
 		return false;
 	},
 	//@param data: Object

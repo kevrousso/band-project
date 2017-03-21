@@ -24,9 +24,15 @@ class FileComments {
 	//get comments from files
 	public function getFileComments() {
 		//order by asc(default)
-		$this->db->query('SELECT id, username, file_id, comment, TIME_FORMAT(timestamp, "%H:%i") AS timestamp FROM filecomments ORDER BY timestamp');
+		$this->db->query('SELECT * FROM filecomments ORDER BY datetime ASC');
 		$comments = $this->db->resultSet();
-		echo json_encode($comments);
+		foreach ($comments as $key => $comment) {
+			//TODO: add format based on language
+			$comment['datetime'] = $this->formatDateTo($comment['datetime']);
+			$comments[$key] = $comment;
+		}
+
+		echo json_encode($comments, JSON_NUMERIC_CHECK);
 	}
 
 	public function postFileComment($data) {
@@ -34,24 +40,51 @@ class FileComments {
 		$fileID = $data->fileID;
 		$comment = $data->comment;
 
-		$this->db->query('INSERT INTO filecomments (username, file_id, comment, timestamp) 
-											VALUES (:username, :file_id, :comment, NOW())');
+		$this->db->query('INSERT INTO filecomments (username, fileID, comment, datetime) 
+											VALUES (:username, :fileID, :comment, NOW())');
 		$this->db->bind(":username", $username);
-		$this->db->bind(":file_id", $fileID);
+		$this->db->bind(":fileID", $fileID);
 		$this->db->bind(":comment", $comment);
 		$this->db->execute();
 
 		//return row
-		$this->db->query('SELECT id, username, file_id, comment, TIME_FORMAT(timestamp, "%H:%i") AS timestamp FROM filecomments WHERE id = :id');
+		$this->db->query('SELECT id, username, fileID, comment, datetime FROM filecomments WHERE id = :id');
 		$this->db->bind(":id", $this->db->lastInsertID());
 		$comment = $this->db->single();
-		echo json_encode($comment);
+
+		//Format date to correct language
+		$comment['datetime'] = $this->formatDateTo($comment['datetime']);
+
+		echo json_encode($comment, JSON_NUMERIC_CHECK);
 	}
 
-	public function deleteFileComments($file_id) {
-		$this->db->query('DELETE FROM filecomments WHERE file_id = :file_id');
-		$this->db->bind(':file_id', $file_id);
+	public function deleteFileComments($fileID) {
+		$this->db->query('DELETE FROM filecomments WHERE fileID = :fileID');
+		$this->db->bind(':fileID', $fileID);
 		$this->db->execute();
+	}
+
+	public function formatDateTo($datetime) {
+		//format to french date "YYYY-DD-MM hh:mm:ss" -> "DD-MM-YYYY hh:mm:ss"
+		//http://php.developpez.com/faq/?page=dates#date_mysqlfr
+		$now = $datetime;
+		list($date, $time) = explode(" ", $now);
+		list($year, $month, $day) = explode("-", $date);
+		list($hour, $min, $sec) = explode(":", $time);
+		$now = "$day/$month/$year $time";
+
+		$months = array("janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août", "septembre", "octobre", "novembre", "décembre");
+		
+		//check if comment was posted today
+		$todayDay = date("j") - 1;
+		$todayMonth = date("n");
+		$todayYear = date("Y");
+		$parsedDate = '';
+		//echo "$day  $todayDay  $month  $todayMonth  $year  $todayYear";
+		if ($day != $todayDay || $month != $todayMonth || $year != $todayYear) {
+			$parsedDate = $parsedDate . "$day " . $months[$month-1] . " " . $year . ", à ";
+		}
+		return $parsedDate . "${hour}h${min}";
 	}
 }
 ?>

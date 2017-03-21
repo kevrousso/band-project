@@ -8,7 +8,7 @@ class Utils {
 	public function __construct(){
 
 	}
-	public function updateMessages() {
+	public function sendLogInfos() {
 		$this->info = array(
 			'message' => $this->msg,
 			'error' => $this->error

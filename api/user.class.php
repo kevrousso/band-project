@@ -9,7 +9,7 @@ class User {
 	private $db;
 	public $username;
 	public $salt;
-	public $auth_key;
+	public $authKey;
 
 	public function __construct($db) {
 		session_start();
@@ -30,8 +30,8 @@ class User {
 			return $this->username;
 		}
 	}
-	/*TODO: not sure that those are very useful...since we can just call: $this->user->auth_key*/
-	public function getAuthKey()  { return $this->auth_key; }
+	/*TODO: not sure that those are very useful...since we can just call: $this->user->authKey*/
+	public function getAuthKey()  { return $this->authKey; }
 
 	public function getSalt() {
 		$this->db->query('SELECT salt FROM users WHERE name = :name');

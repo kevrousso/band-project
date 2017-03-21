@@ -49,11 +49,11 @@ class Auth {
 			$biscuit = json_decode($_COOKIE['login_info']);
 
 			$possibleUser = $this->user->getUserInfo($biscuit->name);
-			$unsafeKey = $biscuit->auth_key;
+			$unsafeKey = $biscuit->authKey;
 
 			//validate that the user has been found in DB
 			if (!empty($possibleUser) && isset($possibleUser)
-				&& $unsafeKey == $possibleUser["auth_key"]) 
+				&& $unsafeKey == $possibleUser["authKey"]) 
 			{				
 				$this->user->username = $possibleUser["name"];
 				//Update User Status
@@ -89,12 +89,12 @@ class Auth {
 					// Generate new auth key for each log in 
 					// (so old auth key can not be used multiple times in case of cookie hijacking)
 					$cookie_auth = $this->userTools->randomString(50);
-					$this->user->auth_key = $this->userTools->hashData($cookie_auth);
+					$this->user->authKey = $this->userTools->hashData($cookie_auth);
 					$this->userTools->updateAuthKey();
 
 					$cookie = array(
 						'name' => $this->user->username,
-						'auth_key' => $this->user->auth_key
+						'authKey' => $this->user->authKey
 					);
 
 					setcookie('login_info', json_encode($cookie), time() + 86400); //Expires after 24 hours
@@ -107,7 +107,7 @@ class Auth {
 			}
 		} else {
 			$this->utils->error = 'Wrong username or password.';
-			$this->utils->updateMessages();
+			$this->utils->sendLogInfos();
 		}
 	}
 	public function logout() {

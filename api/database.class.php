@@ -27,7 +27,7 @@ class Database {
 		}
 		catch(PDOException $e) {
 			$this->utils->error = $e->getMessage();
-			$this->utils->updateMessages();
+			$this->utils->sendLogInfos();
 		}
 	}
 
@@ -60,7 +60,7 @@ class Database {
 		}
 		catch(PDOException $e) {
 			$this->utils->error = $e->getMessage();
-			$this->utils->updateMessages();
+			$this->utils->sendLogInfos();
 		}
 	}
 	public function resultSet() {

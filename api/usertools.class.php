@@ -37,9 +37,9 @@ class UserTools {
 
 	public function updateAuthKey() {
 		$this->user->username = $this->user->getUsername();
-		$this->db->query('UPDATE users SET auth_key = :auth_key WHERE name = :username');
+		$this->db->query('UPDATE users SET authKey = :authKey WHERE name = :username');
 		$this->db->bind(':username', $this->user->username);
-		$this->db->bind(':auth_key', $this->user->auth_key);
+		$this->db->bind(':authKey', $this->user->authKey);
 		$this->db->execute();
 	}
 
@@ -74,7 +74,7 @@ class UserTools {
 			}
 		}
 		
-		$this->utils->updateMessages();
+		$this->utils->sendLogInfos();
 	}
 
 	//shown only once to users
@@ -91,14 +91,14 @@ class UserTools {
 
 		if ($this->usernameExist()) {
 			$this->utils->error = 'Username already exists.';
-			$this->utils->updateMessages();
+			$this->utils->sendLogInfos();
 		} else {
-			$this->db->query('INSERT INTO users (name, password, salt, auth_key, status) 
-												VALUES (:username, :password, :salt, :auth_key, :status)');
+			$this->db->query('INSERT INTO users (name, password, salt, authKey, status) 
+												VALUES (:username, :password, :salt, :authKey, :status)');
 			$this->db->bind(':username', $this->user->username);
 			$this->db->bind(':password', $this->user->password);
 			$this->db->bind(':salt', $this->user->salt);
-			$this->db->bind(':auth_key', "");
+			$this->db->bind(':authKey', "");
 			$this->db->bind(':status', "");
 			$this->db->execute();
 

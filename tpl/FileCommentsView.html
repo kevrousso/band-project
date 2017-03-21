@@ -6,9 +6,9 @@
 		</svg>
 	</span>
 	<div class="comment-holder">
-		<p class="user-info">
+		<p class="user-info <%=item.isCurrentUser%>">
 			<span class="name"><%=item.username%></span>
-			<span class="time"><%=item.timestamp%></span>
+			<span class="time"><%=item.datetime%></span>
 		</p>
 		<pre class="comment"><%=item.comment%></pre>
 	</div>
