@@ -1,7 +1,7 @@
-[{ "id": 0, "name": "Aspire.mp3", "machine_name": "Aspire.mp3", "folder_id": 0, "type": "music", "date_created": "" },
-{ "id": 1, "name": "Cloudpuncher.mp3", "machine_name": "Cloudpuncher.mp3", "folder_id": 0, "type": "music", "date_created": "" },
+[{ "id": 0, "name": "Aspire.mp3", "machine_name": "Aspire.mp3", "folder_id": 0, "type": "audio", "date_created": "" },
+{ "id": 1, "name": "Cloudpuncher.mp3", "machine_name": "Cloudpuncher.mp3", "folder_id": 0, "type": "audio", "date_created": "" },
 { "id": 2, "name": "video-2014-05-03", "machine_name": "video-2014-05-03", "folder_id": 2, "type": "video", "date_created": "" },
 { "id": 3, "name": "video-2014-06-12", "machine_name": "video-2014-06-12", "folder_id": 2, "type": "video", "date_created": "" },
 { "id": 4, "name": "bandRiffster_V1.png", "machine_name": "bandRiffster_V1.png", "folder_id": 3, "type": "image", "date_created": "" },
 { "id": 5, "name": "bandRiffster_V1.1.png", "machine_name": "bandRiffster_V1.1.png", "folder_id": 3, "type": "image", "date_created": "" },
-{ "id": 6, "name": "doc 2014-05-03 a voir", "machine_name": "doc_2014-05-03", "folder_id": 4, "type": "file", "date_created": "" }]
+{ "id": 6, "name": "doc 2014-05-03 a voir.doc", "machine_name": "doc_2014-05-03_a_voir.doc", "folder_id": 4, "type": "file", "date_created": "" }]

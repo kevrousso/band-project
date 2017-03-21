@@ -1,11 +1,44 @@
 /*! HTML5 Boilerplate v4.3.0 | MIT License | http://h5bp.com/ */
 
+@font-face {
+	font-family: 'Devil Breeze Book';
+	font-style: normal;
+	font-weight: normal;
+	src: url('../fonts/Devil Breeze Book.woff') format('woff');
+}
+@font-face {
+	font-family: 'Devil Breeze Demi';
+	font-style: normal;
+	font-weight: normal;
+	src: url('../fonts/Devil Breeze Demi.woff') format('woff');
+}
+@font-face {
+	font-family: 'Devil Breeze Light';
+	font-style: normal;
+	font-weight: normal;
+	src: url('../fonts/Devil Breeze Light.woff') format('woff');
+}
+@font-face {
+	font-family: 'Devil Breeze Medium';
+	font-style: normal;
+	font-weight: normal;
+	src: url('../fonts/Devil Breeze Medium.woff') format('woff');
+}
+@font-face {
+	font-family: 'Devil Breeze Bold';
+	font-style: normal;
+	font-weight: normal;
+	src: url('../fonts/Devil Breeze Bold.woff') format('woff');
+}
+
 html, button, input, select, textarea { color: #222; }
 
 html { font-size: 1em; line-height: 1.4; }
 
 ::-moz-selection { background: #b3d4fc; text-shadow: none; }
-::selection { background: #b3d4fc; text-shadow: none; }
+::selection { background: #4CBEFF; text-shadow: none; color: #222; }
+
+* { font-family: 'Asap', sans-serif !important; }
 
 hr {
 	display: block;
@@ -42,18 +75,18 @@ a { text-decoration: none; }
 }
 .wrapper { width: 90%;margin: 0 5%; }
 
-.header-container { border-bottom: 10px solid #222; }
+.header-container { border-bottom: 10px solid #0E1720; }
 
 .main-container h3.noPreview { text-align: center; }
 .main-container a.fullscreen img { width: 100%;height: 100%; }
 
-.header-container, .footer-container, .main nav { background: #111; }
+.header-container, .footer-container, .main nav { background: #0A0A0A; }
 .footer-container {
 	position: relative;
 	z-index: 1000000;
 	clear: both;
 	height: 115px;
-	border-top: 10px solid #222;
+	border-top: 10px solid #0E1720;
 }
 .title { color: white; }
 
@@ -118,13 +151,12 @@ a { text-decoration: none; }
 }
 #types a.filter {
 	display: inline-block;
-	padding: 1px 9px;
+	padding: 0px 7px;
 	margin: 0 3px;
 	background: #63ABC7;
-	color: #fff;
+	color: #FFF;
 	text-decoration: none;
-	border-radius: 3px;
-	border: 1px solid #63abc7;
+	border: 1px solid #63ABC7;
 }
 #types a.filter:hover, #types a.filter.selected {
 	background: #007a96 !important;
@@ -139,15 +171,15 @@ form#upload input { display: none; }
 
 /*Loadng Icon: http://tobiasahlin.com/spinkit/*/
 .spinner {
-  margin: 100px auto;
+  margin: 0 auto;
   width: 50px;
   height: 30px;
   text-align: center;
   font-size: 10px;
+  display: none;
 }
 
 .spinner > div {
-  background-color: #333;
   height: 100%;
   width: 6px;
   display: inline-block;
@@ -155,6 +187,9 @@ form#upload input { display: none; }
   -webkit-animation: stretchdelay 1.2s infinite ease-in-out;
   animation: stretchdelay 1.2s infinite ease-in-out;
 }
+#login .spinner { position: absolute; width: 100%; top: -50px; }
+#login .spinner > div { background-color: #ccc; }
+.nav-container .spinner > div, .main-container .spinner > div { background-color: #222; }
 
 .spinner .rect2 {
   -webkit-animation-delay: -1.1s;
@@ -221,12 +256,64 @@ form#upload input { display: none; }
 .main form input[type="submit"] { text-transform: uppercase; margin-top: 20px; }
 
 .ui-resizable-handle { width: 8px; right: -5px; }
-.ui-resizable-handle:hover, .ui-resizable-handle:active { background-color: #222; }
+.ui-resizable-handle:hover, .ui-resizable-handle:active { background-color: #0E1720; }
 
 /* ==============
 	MOBILE: Menu
    ============== */
 
+/* Login section */
+/*background url: http://wallpaperswide.com/armenia_secret_2-wallpapers.html*/
+.login-container { background: url(../img/armenia_secret_2-wallpaper-1920x1080.jpg); background-repeat: no-repeat; background-size: cover; background-position: center; width: 100%; height: 100%; position: absolute; z-index: 99999999; }
+.login-container video { position: fixed; width:100%; }
+#login { margin: 0 auto; height: 100%; float: left; width: 100%; position: relative; }
+#login h1.bandname { font-family: "Devil Breeze Medium" !important; color: #CCC; text-align: center; position: relative; font-size: 5em; text-transform: lowercase; }
+#login form { margin: 0 auto; position: relative; top: 45%; text-align: center; }
+
+/*Style 1: clean, only border-bottom under inputs*/
+/*
+#login form .input-wrap { position: relative; margin: 0 auto; display: table; }
+#login form input { width: 20em; margin: 0 auto; display: list-item; margin-bottom: 10px; }
+#login form input[type=text], #login form input[type=password] { text-indent: 50px; opacity: 0.8; color: #EBEBEB; border: none; border-bottom: 1px solid #AFAFAF; background-color: transparent; }
+#login form label { position: absolute; margin-top: 0.3em; left: 10px; }
+#login form .input-wrap:after { content: ""; position: absolute; left: 45px; top: 4px; height: 30px; border-left: 1px solid #FFF; }
+#login form input[type=submit] { margin-top: 2em; background-color: rgba(0, 0, 0, 0); opacity: 0.7; color: #FFF; border: none; border-bottom: 1px solid; width: 52px; padding-left: 0; padding-right: 0; }
+*/
+
+/*Style 2*/
+#login form .input-wrap { position: relative; margin: 0 auto; display: table; background-color: rgba(34, 34, 34, 0.51); margin-top: 10px; }
+#login form input { width: 20em; margin: 0 auto; display: list-item; margin-bottom: 5px; margin-top: 5px; }
+#login form input[type=text], #login form input[type=password] { text-indent: 50px; opacity: 0.8; color: #EBEBEB; border: none; background-color: transparent; }
+#login form label { position: absolute; margin-top: 0.5em; left: 10px; }
+#login form .input-wrap:after { content: ""; position: absolute; left: 45px; top: 7px; height: 30px; border-left: 1px solid #FFF; }
+#login form input[type=submit] { display: none; }
+
+#login form .invalid {
+	background-color: rgba(34, 34, 34, 0.85);
+	margin: 0 auto;
+	display: table;
+	padding: 3px 30px;
+	margin-top: 10px;
+	display: none;
+}
+#login form .invalid .error { color: #FF4136; }
+
+
+#login form label svg { fill: #FFF; width: 25px; height: 25px; }
+#login form label svg, #login form .input-wrap:after { opacity: 0.5; }
+#login form input:focus, #login form input:active { outline: none; }
+#login form input[type=submit]:hover { opacity: 1 }
+
+::-webkit-input-placeholder { color: #CCC; }
+:-moz-placeholder { color: #CCC; } /* Firefox 18- */
+::-moz-placeholder { color: #CCC; } /* Firefox 19+ */
+:-ms-input-placeholder { color: #CCC; }
+/* END Login section */
+
+
+#container { position: relative; }
+#interface-wrapper { display: inline-table; width: 100%; height: 100%; }
+.nav-container, .main-container { display: none; }
 nav#menu ul, #navContent, #navContent ul {
 	margin: 0;
 	padding: 0;
@@ -276,6 +363,7 @@ nav#menu a:hover {
 /* ====================
 	INTERMEDIATE: Menu
    ==================== */
+	.nav-container, .main-container { display: none; }
 
 	nav#menu a {
 		float: left;
@@ -299,7 +387,7 @@ nav#menu a:hover {
 
 @media only screen and (min-width: 768px) {
 
-	#container { display: table; width: 100%; }
+	#container { display: table; width: 100%; position: relative; }
 	.nav-container {
 		display: table-cell;
 		width: 24%;
@@ -320,6 +408,7 @@ nav#menu a:hover {
 		background-color: #FFF;
 		border-bottom: 0;
 	}
+	.nav-container, .main-container { display: none; }
 
 	#navContent, #navContent ul { float: left; }
 	/*Folder items*/

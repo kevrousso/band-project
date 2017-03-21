@@ -5,6 +5,6 @@
 			id: 0,
 			name: 'Folder name',
 			machineName: 'Folder_Name',
-			files: {}
+			files: []
 		}
 	});

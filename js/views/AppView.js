@@ -9,8 +9,7 @@ var app = app || {};
 			this.$headerContainer = $('.header-container');
 			this.$footerContainer = $('.footer-container');
 
-			//init Navigation View
-			NavView = new app.NavView({ folder: new app.Folder(), file: new app.File() });
+			LoginView = new app.LoginView();
 
 			//set proper heights on init
 			this.resize();

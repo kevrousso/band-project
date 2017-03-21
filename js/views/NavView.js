@@ -3,83 +3,75 @@ var app = app || {};
 	app.NavView = Backbone.View.extend({
 		el: ".nav-container",
 		tagName: 'li',
-		// Delegated events for selecting files to be played/showed (music, video, image, file)
 		events: {
 			'click li.dir a.hasContent': 'toggleFolderView',
 			'click li.dir .content li a': 'showContent',
-			'mouseenter li.dir .content li a'  : 'hoveringSubMenu',	//sets a bool to true to indicate we're hover the subMenu
-			'mouseleave li.dir .content li a'  : 'leavingSubMenu',	//sets a bool to false to indicate we're leaving the subMenu
-			'click a.timestamp': 'updateTimestamp',
-			'click a.fullscreen': 'toggleFullscreen',
 			'keyup #searchBox': 'setSearchFilter',
 			'click .clear': 'clearSearch',
 			'click a.filter': 'setFilter'
 		},
 		initialize: function() {
+			//caching...
 			var that = this;
 
-			//caching...
-			this.$mainContainer = $('.main-container');
-			this.$mainContent = $('#mainContent');
-			this.$container = $('#container');
+			this.$el.fadeIn(250).css("display", "table-cell");
+
 			this.$navContent = this.$el.find("#navContent");
 			this.$formAddFile = $("#upload");
-			this.$formConvo = $(".addComment");
 			this.$spinner = this.$el.find(".spinner");
 			this.$filters = this.$el.find("#filters");
 			this.$types = this.$filters.find("#types");
+			this.$container = $('#container');
 			this.maxWidth = this.$container.width() / 2;
 
 			this.$el.resizable({ handles: "e", "maxWidth": that.maxWidth });
 
 			//load proper template
-			app.utils.loadTemplate(["NavView"]);
+			app.utils.loadTemplate("NavView");
 
 			this.collection = new app.FolderList();
 			this.files = new app.FileList();
 
+			//Set default filters
+			this.filterType = "all";
+			this.searchFilter = '';
+
 			this.getFiles(this.getFolders);
 
-			this.on('change:filterType', this.filterByType, this);
-			this.on('change:searchFilter', this.filterBySearch, this);
-			this.collection.on('reset', this.render, this);
+			this.on('change:filterByType', this.filterByType, this);
+			this.on('change:filterBySearch', this.filterBySearch, this);
+			this.on('change:updateViewArea', this.updateViewArea, this);
 
-			this.searchFilter = '';
-			//Default filterType to all
-			this.filterType = "all";
+			//this.collection.on('all', this.render, this);
+			//this.files.on('all', this.render, this);
 
-			$('.clear').hide();
-
+			//prepare context menu
+			this._createContextMenu();
 			return this;
 		},
 		render: function() {
-			var that = this;
+			var that = this,
+				filtered = this.getFilteredBySearchAndType(this.searchFilter, this.filterType);
+
+			this.filteredList = new app.FolderList(filtered);
 
 			this.$navContent.hide().html("");
-			if ( this.collection.length ) {
-				this.collection.each(function(folder){
+			this.$spinner.hide();
+			if ( this.filteredList.length ) {
+				this.filteredList.each(function(folder) {
 					that.$navContent.append( that.template( {item: folder.toJSON()} ) );
 				});
 			}
+			//TODO: maybe make a function toggleSpinner( spinner, $elToShow )
 			this.$spinner.fadeOut(150, function() {
-				that.$navContent.fadeIn();
+				that.$navContent.fadeIn("fast");
 			});
-
-			if (!Backbone.History.started) {
-				//make sure links gets registered by the router
-				AppRouter = new app.Router();
-				Backbone.history.start();
-			}
 
 			this.updateSearchUI();
 			this.updateFiltersUI();
-
-			//prepare context menu
-			this.createContextMenu();
-			
 			return this;
 		},
-		createContextMenu: function() {
+		_createContextMenu: function() {
 			var that = this;
 			$.contextMenu({
 				selector: 'li, .nav-container', 
@@ -88,26 +80,22 @@ var app = app || {};
 					var $el = $(this);
 					that.updateNavMenu($el, key, options);
 				},
-				items: {
-					"addfile": { name: "Add File", icon: "addFile",
+				items: { "addfile": { name: "Add File", icon: "addFile",
 						disabled: function(key, opt) { 
 							// disable adding files in the root directory and on files
 							return !this.hasClass("dir") || this.hasClass("file");
 						}
-					},
-					"addfolder": { name: "Add Folder", icon: "addFolder",
+					}, "addfolder": { name: "Add Folder", icon: "addFolder",
 						disabled: function(key, opt) { 
 							// disable adding folders in folders
 							return this.hasClass("dir") || this.hasClass("file");
 						}
-					},
-					"rename": { name: "Rename", icon: "rename",
+					}, "rename": { name: "Rename", icon: "rename",
 						disabled: function(key, opt) { 
 							// disable renaming if not over folder or file
-							return !this.hasClass("dir") || !this.hasClass("file");
+							return !this.hasClass("dir") && !this.hasClass("file");
 						}
-					},
-					"delete": { name: "Delete", icon: "delete",
+					}, "delete": { name: "Delete", icon: "delete",
 						disabled: function(key, opt) { 
 							// disable deleting if not over folder or file
 							return !this.hasClass("dir") && !this.hasClass("file");
@@ -116,8 +104,19 @@ var app = app || {};
 				}
 			});
 		},
+		_createFilters: function() {
+			var filters = '<a class="filter" href="#all">All</a>',
+				txt = "";
+			_.each(this.getTypes(), function(item) {
+				txt = item.charAt(0).toUpperCase() + item.substring(1);
+				filters += '<a class="filter" href="#' + item + '">' + txt + '</a>';
+			});
+			return filters;
+		},
 		updateNavMenu: function($el, key, options) {
-			var that = this;
+			var that = this,
+				type = $el.hasClass("dir") ? "folder" : "file",
+				name = $el.find("a.hasContent").text().trim() || $el.find("a").text().trim();
 			switch (key) {
 				case "addfolder": 
 					// You can only add folders to the root. No sub-folders.
@@ -126,9 +125,11 @@ var app = app || {};
 						//validate that there isn't already a folder with that name
 						if (that.isFolderNameUnique(foldername)) {
 							//get max id and incremente it by 1 because ids are Unique
-							var maxID = that.getMaxFolderID(),
-								newFolder = new app.Folder({ id: parseInt(maxID)+1, name: foldername, machineName: foldername });
+							var nextID = that.getNextModelID(that.collection.models),
+								newFolder = new app.Folder({ id: nextID, name: foldername, machineName: foldername });
+							
 							that.collection.add(newFolder);
+							app.utils.postData("postFolder", JSON.stringify(newFolder.toJSON()));
 							that.render();
 						} else {
 							alert("Folder name already exist.")
@@ -140,29 +141,25 @@ var app = app || {};
 						e.preventDefault();
 						var fileInfo = e.target.files[0],
 							filename = fileInfo.name,
-							type = fileInfo.type.split("/")[0];
-						//validate that there isn't already a file with that name
+							fileType = fileInfo.type.split("/")[0];
+						//validate that there isn't already a file with that name in the folder
 						if (that.isFileNameUnique(filename)) {
-								//checks if folder hasContent and defaults to first </a>
-							var foldername = $el.find("a.hasContent").text().trim() || $el.find("a").text().trim(),
-								folder = _.filter(that.collection.models, function(m){
-									return m.get('name') === foldername;
-								}),
-								folderID = folder[0].get("id"),
-								currentfiles = folder[0].get("files");
+								//checks if folder hasContent or defaults to first </a>
+							var folder = that.getModelByName(that.collection.models, name),
+								folderID = folder.get("id"),
+								currentfiles = folder.get("files");
 								//get max id and incremente it by 1 because ids are Unique
-							var maxID = that.getMaxFileID();
-							
-							if (type !== "audio" && type !== "video" && type !== "image") {
-								type = "file";
+							var nextID = that.getNextModelID(that.files.models);
+
+							if (fileType !== "audio" && fileType !== "video" && fileType !== "image") {
+								fileType = "file";
 							}
 							var newFile = new app.File({
-								id: parseInt(maxID)+1,
+								id: nextID,
 								name: filename,
 								machineName: app.utils.cleanUpSpecialChars(filename),
 								folderID: folderID,
-								type: type,
-								dateCreated: new Date()
+								type: fileType
 							});
 
 							//update files collection
@@ -170,58 +167,98 @@ var app = app || {};
 							currentfiles.push(newFile);
 
 							that.render();
+
+							//can't use this as we need the file to be posted $_FILES
+							//app.utils.postData("postFile", JSON.stringify(newFile.toJSON()));
+
+							that.$formAddFile.find("input[name=fileName]").val(newFile.get("name"));
+							that.$formAddFile.find("input[name=fileMachineName]").val(newFile.get("machineName"));
+							that.$formAddFile.find("input[name=fileFolderID]").val(newFile.get("folderID"));
+							that.$formAddFile.find("input[name=fileType]").val(newFile.get("type"));
+							that.$formAddFile.submit();
+						} else {
+							alert("File already exist in that folder.");
 						}
-						return false;
+						//reset the input file so that error message is shown if file is uploaded twice
+						$(this).val("");
 					});
 					this.$formAddFile.find("input").trigger("click");
-				// TODO
-					//pop a file upload window
-					//add model to collection and RENDER
-
-					//that.render();
 				break;
 				case "rename":
+					var newName = prompt("Enter a new name", name);
+					if (newName && newName.trim() !== "") {
+						var newMachineName = app.utils.cleanUpSpecialChars(newName),
+							model, oldName = "", id = 0;
+						if (type === "folder") {
+							model = that.getModelByName(that.collection.models, name);
+						} else if (type === "file") {
+							model = that.getModelByName(that.files.models, name);
+						}
+						oldName = model.get("machineName");
+						id = model.get("id");
+
+						that.renameElement(type, name, newName, newMachineName);
+
+						//TODO: add backend renaming
+						app.utils.postData("renameFile", JSON.stringify({id: id, oldName: oldName, newName: newMachineName}));
+					}
 				break;
 				case "delete":
-					var type = $el.hasClass("dir") ? "folder" : "file",
-						name = $el.find("a.hasContent").text().trim() || $el.find("a").text().trim(),
-						msg = 'Do you really want to permanantly delete '+ type +' "'+ name +'" ?';
+					var msg = 'Do you really want to permanantly delete '+ type +' "'+ name +'" ?',
+						modelMachineName = "", fileModel, folderModel;
 					if ($el.find("a").hasClass("hasContent")) {
 						msg = 'Do you really want to permanantly delete '+ type +' "'+ name +'" and ALL it\'s content ?';
 					}
 					if (window.confirm(msg)) { 
 						//remove model from collection and RENDER
 						if (type === "folder") {
-							that.collection.remove(that.getFolderByName(name));
+							folderModel = that.getModelByName(that.collection.models, name);
+							app.utils.postData("deleteFolder", folderModel.get("machineName"));
+
+							//TODO: if it contains files....call deleteFile on each
+							//actually, on cascade delete should handle this
+
+							that.collection.remove(folderModel);
 						} else {
+							fileModel = that.getModelByName(that.files.models, name);
 							that.removeFileByName(name);
+							app.utils.postData("deleteFile", fileModel.get("machineName"));
 						}
-
-						//TODO
-						//update foldersUI to check if has files, if not, removeClass("hasContent")
-
 						that.render();
 					}
 				break;
 			}
-			//re-store a copy of collection 
-			directoryData = this.collection.toJSON();
 		},
-		getMaxFolderID: function() {
-			return this.collection.max(function(m){
-				return m.get('id');
-			}).get("id");
+		//@param type: string
+		//@param oldName: string
+		//@param name: string
+		//@param machineName: string
+		renameElement: function(type, oldName, name, machineName) {
+			var model;
+			if (type === "folder") {
+				model = this.getModelByName(this.collection.models, oldName);
+			} else if (type === "file") {
+				model = this.getModelByName(this.files.models, oldName);
+			}
+			model.set("name", name);
+			model.set("machineName", machineName);
 		},
-		getMaxFileID: function() {
+		//@param collection: Backbone Collection
+		//return: int
+		getNextModelID: function(collection) {
 			var tmpID = 0;
-			_.each(this.files.models, function(m) {
+			_.each(collection, function(m) {
 				tmpID = m.get('id') > tmpID ? m.get('id') : tmpID;
 			});
-			return parseInt(tmpID, 10);
+			return parseInt(tmpID, 10) + 1;
 		},
+		//@param name: string
+		//return: bool
 		isFolderNameUnique: function(name) {
 			return !this.collection.findWhere({name: name});
 		},
+		//@param name: string
+		//return: bool
 		isFileNameUnique: function(name) {
 			var unique = true;
 			_.each(this.files.models, function(file) {
@@ -231,11 +268,15 @@ var app = app || {};
 			});
 			return unique;
 		},
-		getFolderByName: function(name) {
-			return _.filter(this.collection.models, function(folder) {
-				return folder.get("name") === name;
+		//@param collection: Backbone collection
+		//@param name: string
+		//return: model
+		getModelByName: function(collection, name) {
+			return _.find(collection, function(mod) {
+				return mod.get("name") === name;
 			});
 		},
+		//@param name: string
 		removeFileByName: function(name) {
 			return _.find(this.collection.models, function(folder) {
 				var newFiles = _.filter(folder.get("files"), function(file) {
@@ -244,6 +285,7 @@ var app = app || {};
 				folder.set("files", newFiles);
 			});
 		},
+		//@param callback: function
 		getFiles: function(callback) {
 			var that = this;
 			this.files.fetch({
@@ -252,6 +294,8 @@ var app = app || {};
 				success: function(model, response) {
 					if (callback) {
 						callback.call(that);
+					} else {
+						alert("No callback provided for method getFiles()");
 					}
 				}
 			});
@@ -271,51 +315,40 @@ var app = app || {};
 							folder.set("files", associatedFile);
 						});
 					});
-					//save a copy of the collection
-					directoryData = that.collection.toJSON();
 					//createFilters
-					that.$types.append(that.createFilters());
-					that.render();
+					that.$types.append(that._createFilters());
+					if (!window.location.hash) {
+						that.render();
+					}
+					if (!Backbone.History.started) {
+						//make sure links gets registered by the router
+						AppRouter = new app.Router();
+						Backbone.history.start();
+					}
 				}
 			});
 		},
+		//gets each file's types, return unique ones
 		getTypes: function() {
-			var tmpTypes = [], files;
-			this.collection.each(function(model, index) {
-				files = model.get("files");
-				_.each(files, function(file, i) {
-					tmpTypes.push(file.get("type"));
-				});
-			});
-
-			return _.uniq(tmpTypes);
+			return _.uniq(this.files.pluck("type"));
 		},
-		createFilters: function() {
-			var filters = '<a class="filter" href="#all">All</a>',
-				txt = "";
-			_.each(this.getTypes(), function(item) {
-				txt = item.charAt(0).toUpperCase() + item.substring(1);
-				filters += '<a class="filter" href="#' + item + '">' + txt + '</a>';
-			});
-			return filters;
-		},
+		// TODO: make function without args, bing it to (change:toggleFolderView)
 		toggleFolderView: function(e, routing) {
-			if (!this.hoverSubmenu) {
-				var $this = $(e.target);
+			var $this = $(e.target);
 
-				//check if called from routing
-				if (routing) {
-					$this.addClass("opened");
-					$this.next(".content").stop(true, true).slideDown(250);
-				} else {
-					$this.toggleClass("opened");
-					$this.next(".content").stop(true, true).slideToggle(250);
-				}
-				
+			//check if called from routing
+			if (routing) {
+				$this.addClass("opened");
+				$this.next(".content").stop(true, true).slideDown(250);
+			} else {
+				$this.toggleClass("opened");
+				$this.next(".content").stop(true, true).slideToggle(250);
 			}
+
 			this.currentfolder = e.target.text;
 			return false;
 		},
+		// TODO: make function without args, bing it to (change:showContent)
 		showContent: function(e, routing) {
 			var $this = $(e.target),
 				$files = $(".content li"),
@@ -329,139 +362,44 @@ var app = app || {};
 				} else {
 					$this.parent().toggleClass("selected");
 				}
-				this._updateContent(src, type);
+				this.trigger("change:updateViewArea", {src: src, type: type} );
 			}
-		},
-		_updateContent: function(src, type) {
-			var html = "", that = this, align = "";
-			switch (type) {
-				case "audio":
-					html += '<audio id="player-audio" controls="controls" preload="metadata">';
-					html +=		'Votre navigateur ne supporte pas l\'élément <code>audio</code> element.';
-					html += 	'<source src="'+src+'" type="audio/mp3">';
-					html +=	'</audio>';
-
-					this.$formConvo.show();
-					align = "top";
-				break;
-				case "video":
-					html += '<video id="player-video" controls="controls" preload="metadata">';
-					html +=		'Votre navigateur ne supporte pas l\'élément <code>video</code> element.';
-					html += 	'<source src="'+src+'.mp4" type="video/mp4">';
-					html += 	'<source src="'+src+'.webm" type="video/webm">';
-					html += 	'<source src="'+src+'.ogv" type="video/ogg">';
-					html +=	'</video>';
-
-					this.$formConvo.show();
-					align = "top";
-				break;
-				case "image":
-					html += '<a href="#" class="fullscreen"><img src="'+ src +'"/></a><div class="full-img"><a href="#" class="fullscreen"><img src="" alt="" /></a></div>';
-					align = "top";
-				break;
-				case "file":
-					html += "<h3 class='noPreview'>No preview availlable</h3>";
-					this.$formConvo.hide();
-					align = "middle";
-				break;
-			}
-			this.$mainContent.stop(true, true).fadeOut("fast", function() {
-				that.$mainContainer.css("vertical-align", align);
-				that.$mainContent.html("").append(html).stop(true, true).fadeIn();
-			});
-			// TODO: based on what file has been selected
-			//updateConversations();
-		},
-		updateTimestamp: function() {
-			var time = $(this).text(),
-				audioPlayer = $('#player-audio')[0];		//TODO: CACHE
-			if (audioPlayer.src !== "") {
-				audioPlayer.currentTime = this._formatTimestamp(time);	// in seconds
-				audioPlayer.play();
-			}
-		},
-		_formatTimestamp: function(time) {
-			var ts = time.trim(), minSec = ts.split(":");
-
-			// rule: min * 60 + sec
-			return parseInt(minSec[0]) * 60 + parseInt(minSec[1]);
-		},
-		toggleFullscreen: function(e) {
-			var $this = $(e.target),
-				$imgSrc = $this.attr("src"),
-				$fullImg = $(".full-img"),
-				clientWidth = document.documentElement.clientWidth,
-				width = $this.width(),
-				height = $this.height(),
-				offset = 0.2,
-				widthOffset = width * offset,
-				heightOffset = height * offset,
-				widthTotal = width + widthOffset,
-				heightTotal = height + heightOffset;
-
-			if (!this.isFullScreen) {
-				$fullImg.find("img").attr("src", $imgSrc).width(widthTotal).height(heightTotal).css({"max-width": clientWidth});
-				$fullImg.fadeIn("fast");
-				this.isFullScreen = true;
-			} else {
-				$fullImg.fadeOut("fast");
-				this.isFullScreen = false;
-			}
-			return false;
-		},
-		hoveringSubMenu: function() {
-			this.hoverSubmenu = true;
-		},
-		leavingSubMenu: function() {
-			this.hoverSubmenu = false;
 		},
 		/*Filter events*/
 		filterBySearch: function() {
-			this.collection.reset(directoryData, {silent: true});
-			var filterString = this.searchFilter,
-				filterType = this.filterType,
-				filtered = this.getFilteredBySearchAndType(filterString, filterType);
-
-			this.collection.reset(filtered);
+			this.render();
 		},
 		filterByType: function() {
 			if (!this.$types.find('a[href^=#'+this.filterType+']').hasClass('selected')) {
-				this.collection.reset(directoryData, { silent:true });
-				var filterString = this.searchFilter || '',
-					filterType = this.filterType,
-					filtered = this.getFilteredBySearchAndType(filterString, filterType);
-
-				this.collection.reset(filtered);
-				AppRouter.navigate('filter/' + filterType);
+				this.render();
+				AppRouter.navigate('filter/' + this.filterType);
 			}
 		},
 		clearSearch: function() {
-			this.collection.reset(directoryData, {silent: true});
-			this.searchFilter = '';
-			var searchFilter = this.searchFilter,
-				filterType = this.filterType,
-				filtered = this.getFilteredBySearchAndType(searchFilter, filterType);
 			$('.clear').hide();
-			$('#searchBox').val(searchFilter);
+			this.searchFilter = "";
+			$('#searchBox').val(this.searchFilter);
 
-			this.collection.reset(filtered);
-			AppRouter.navigate('filter/' + filterType);
+			this.render();
+			AppRouter.navigate('filter/' + this.filterType);
 
 			this.$el.find('.content li').removeHighlight();
 		},
 		setSearchFilter: function(e) {
 			this.searchFilter = e.target.value;
-			this.trigger('change:searchFilter');
+			this.trigger('change:filterBySearch');
 		},
 		setFilter: function(e) {
 			e.preventDefault();
 			this.filterType = e.currentTarget.innerHTML.toLowerCase();
-			this.trigger('change:filterType');
+			this.trigger('change:filterByType');
 		},
 		//Returns a collection of folders filtered files by search value and type
 		getFilteredBySearchAndType: function(str, type) {
-			//for each folder
-			return this.collection.each(function(model, index) {
+			//store a copy of collection, so that we don't alter the original
+			var tmpJsonCollection = this.collection.toJSON(),
+				tmpCollection = new app.FolderList(tmpJsonCollection);
+			return tmpCollection.each(function(model, index) {
 				var files = model.get("files"),
 					//only accept same type
 					newM = _.filter(files, function(file) {
@@ -488,5 +426,9 @@ var app = app || {};
 			this.$types.find('a[href^=#'+this.filterType+']').addClass('selected');
 			//highlight searchFilter in filenames
 			this.$el.find('.content li').highlight(this.searchFilter);
+		},
+		//@param data: object {src: , type: }
+		updateViewArea: function(data) {
+			ConvoView.trigger("change:updateView", data);
 		}
 	});
