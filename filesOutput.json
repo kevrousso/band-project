@@ -1,0 +1,7 @@
+[{ "id": 0, "name": "Aspire.mp3", "machineName": "Aspire.mp3", "folderID": 0, "type": "audio", "dateCreated": "" },
+{ "id": 1, "name": "Cloudpuncher.mp3", "machineName": "Cloudpuncher.mp3", "folderID": 0, "type": "audio", "dateCreated": "" },
+{ "id": 2, "name": "video-2014-05-03", "machineName": "video-2014-05-03", "folderID": 2, "type": "video", "dateCreated": "" },
+{ "id": 3, "name": "video-2014-06-12", "machineName": "video-2014-06-12", "folderID": 2, "type": "video", "dateCreated": "" },
+{ "id": 4, "name": "bandRiffster_V1.png", "machineName": "bandRiffster_V1.png", "folderID": 3, "type": "image", "dateCreated": "" },
+{ "id": 5, "name": "bandRiffster_V1.1.png", "machineName": "bandRiffster_V1.1.png", "folderID": 3, "type": "image", "dateCreated": "" },
+{ "id": 6, "name": "doc 2014-05-03 a voir.doc", "machineName": "doc_2014-05-03_a_voir.doc", "folderID": 4, "type": "file", "dateCreated": "" }]

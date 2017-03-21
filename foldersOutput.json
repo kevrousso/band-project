@@ -1,0 +1,45 @@
+[{
+	"id": 0,
+	"name": "Tracks",
+	"machineName": "Tracks"
+},
+{
+	"id": 1,
+	"name": "Riffs Ideas",
+	"machineName": "Riffs Ideas"
+},
+{
+	"id": 2,
+	"name": "Videos",
+	"machineName": "Videos"
+},
+{
+	"id": 3,
+	"name": "Images",
+	"machineName": "Images"
+},
+{
+	"id": 4,
+	"name": "Docs",
+	"machineName": "Docs"
+},
+{
+	"id": 5,
+	"name": "Test",
+	"machineName": "Test"
+},
+{
+	"id": 6,
+	"name": "Test1",
+	"machineName": "Test1"
+},
+{
+	"id": 7,
+	"name": "Test2",
+	"machineName": "Test2"
+},
+{
+	"id": 8,
+	"name": "Test3",
+	"machineName": "Test3"
+}]
