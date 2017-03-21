@@ -6,7 +6,7 @@ app.FileCommentsView = Backbone.View.extend({
 		'click a.timestamp': 'updateTimestamp',
 		'click a.preview': 'toggleFullscreen',
 		'click a.fullscreen': 'toggleFullscreen',
-		'submit': 'postComment'
+		'submit': 'postFileComment'
 	},
 	initialize: function (data) {
 		var that = this;
@@ -24,7 +24,6 @@ app.FileCommentsView = Backbone.View.extend({
 			useKeyboard: false
 		});
 
-		this.$noSelection = this.$mainContent.find(".noSelection");
 
 		this.$data = this.$mainContent.find("#data");
 
@@ -66,27 +65,29 @@ app.FileCommentsView = Backbone.View.extend({
 			type: "POST"
 		});
 	},
-	postComment: function() {
+	postFileComment: function() {
 		var that = this, comment = $.trim(this.$comment.val());
-		app.utils.postData("postComment", {username: this.user, fileID: this.fileID, comment: comment}, 
-			function(data, textStatus, jqXHR) {
-				if (textStatus === "success") {
-					var data = JSON.parse(data);
+		if (comment !== "") {
+			app.utils.postData("postFileComment", {username: this.user, fileID: this.fileID, comment: comment}, 
+				function(data, textStatus, jqXHR) {
+					if (textStatus === "success") {
+						var data = JSON.parse(data);
 
-					//add in models
-					var newComment = new app.FileComment({
-						id: data.id,
-						fileID: data.file_id,
-						username: data.username,
-						comment: data.comment,
-						timestamp: data.timestamp
-					});
-					that.collection.models.push(newComment);
-					that.resetForm();
-					that.render();
+						//add in models
+						var newComment = new app.FileComment({
+							id: data.id,
+							fileID: data.file_id,
+							username: data.username,
+							comment: data.comment,
+							timestamp: data.timestamp
+						});
+						that.collection.models.push(newComment);
+						that.resetForm();
+						that.render();
+					}
 				}
-			}
-		);
+			);
+		}
 		return false;
 	},
 	resetForm: function() {
@@ -105,58 +106,65 @@ app.FileCommentsView = Backbone.View.extend({
 	updateView: function(data) {
 		var html = "", that = this;
 
-		this.fileID = data.fileID;
-
-		switch (data.type) {
-			case "audio":
-				html += '<audio id="player-audio" controls="controls" preload="metadata">';
-				html +=		'Your browser doesn\' support the <code>audio</code> element.';
-				html += 	'<source src="'+data.src+'" type="audio/mp3">';
-				html +=	'</audio>';
-				this.hasPlayer = true;
-			break;
-			case "video":
-				html += '<video id="player-video" controls="controls" preload="metadata">';
-				html +=		'Your browser doesn\' support the <code>video</code> element.';
-				html += 	'<source src="'+data.src+'.mp4" type="video/mp4">';
-				html += 	'<source src="'+data.src+'.webm" type="video/webm">';
-				html += 	'<source src="'+data.src+'.ogv" type="video/ogg">';
-				html +=	'</video>';
-				this.hasPlayer = true;
-			break;
-			case "image":
-				html += '<a href="#" class="preview"><img src="'+ data.src +'"/></a>';
-				html += '<div class="full-img"><a href="#" class="fullscreen"><img src="" alt="" /></a></div>';
-				this.hasPlayer = false;
-			break;
-			//default for unknown file extention
-			default:
-				html += "<h3 class='noPreview'>No preview availlable for that type of file yet.</h3>";
-				this.hasPlayer = false;
-			break;
-		}
-		this.$formConvo.show();
-		this.$noSelection.hide();
-		this.$mainContent.fadeOut(0, function (){
-			//TODO: updateSpinner()
-			that.$spinner.show().css("display", "table-cell");
-
+		if (!data) {
+			html = "<h4 class='noSelection'>Select a file in the menu or upload one using the right-click context menu on the menu.</h4>";
+			this.fileID = null;
+			this.$formConvo.hide();
+			that.$data.empty().append(html);
 			//set proper align to conversations el
-			that.$el.css("vertical-align", "top");
-
-			//reset data elem and append new one
-			that.$data.html("").append(html);
-
-			that.$spinner.fadeOut(250, function() {
-				that.$mainContent.fadeIn(250);
-			});
-		});
+			that.$el.css("vertical-align", "middle");
+		} else {
+			this.fileID = data.fileID;
+			switch (data.type) {
+				case "audio":
+					html += '<audio id="player-audio" controls="controls" preload="metadata">';
+					html +=		'Your browser doesn\' support the <code>audio</code> element.';
+					html += 	'<source src="'+data.src+'" type="audio/mp3">';
+					html +=	'</audio>';
+					this.hasPlayer = true;
+				break;
+				case "video":
+					html += '<video id="player-video" controls="controls" preload="metadata">';
+					html +=		'Your browser doesn\' support the <code>video</code> element.';
+					html += 	'<source src="'+data.src+'.mp4" type="video/mp4">';
+					html += 	'<source src="'+data.src+'.webm" type="video/webm">';
+					html += 	'<source src="'+data.src+'.ogv" type="video/ogg">';
+					html +=	'</video>';
+					this.hasPlayer = true;
+				break;
+				case "image":
+					html += '<a href="#" class="preview"><img src="'+ data.src +'"/></a>';
+					html += '<div class="full-img"><a href="#" class="fullscreen"><img src="" alt="" /></a></div>';
+					this.hasPlayer = false;
+				break;
+				//default for unknown file extention
+				default:
+					html += "<h4 class='noPreview'>No preview availlable for that type of file yet.</h4>";
+					this.hasPlayer = false;
+				break;
+			}
 		
+			this.$formConvo.show();
+			this.$mainContent.fadeOut(0, function (){
+				//TODO: updateSpinner()
+				that.$spinner.show().css("display", "table-cell");
+
+				//set proper align to conversations el
+				that.$el.css("vertical-align", "top");
+
+				//reset data elem and append new one
+				that.$data.empty().append(html);
+
+				that.$spinner.fadeOut(250, function() {
+					that.$mainContent.fadeIn(250);
+				});
+			});
+		}
 		this.render();
 	},
 	updateFileComments: function() {
 		var that = this;
-		this.$comments.html("");
+		this.$comments.empty();
 		if (this.filteredList.length) {
 			this.filteredList.each(function(comment) {
 				//format only if a player is present
@@ -167,7 +175,9 @@ app.FileCommentsView = Backbone.View.extend({
 			});
 			this.$scrollable.perfectScrollbar('update');
 		} else {
-			this.$comments.html("<p>No comments yet. Be the first!</p>");
+			if (this.$data.find(".noSelection").length === 0) {
+				this.$comments.html("<p>No comments yet. Be the first!</p>");
+			}
 		}
 	},
 	formatMessageTimestampReference: function(comment) {

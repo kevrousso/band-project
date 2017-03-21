@@ -17,5 +17,6 @@ var app = app || {};
 					dateCreated: item.date_created
 				};
 			});
-		}
+		},
+		comparator: "name"
 	});

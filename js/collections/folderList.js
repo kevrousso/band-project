@@ -13,5 +13,6 @@ var app = app || {};
 					machineName: item.machine_name
 				};
 			});
-		}
+		},
+		comparator: "name"
 	});

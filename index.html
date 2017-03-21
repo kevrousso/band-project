@@ -17,10 +17,12 @@
 		<link rel="stylesheet" href="css/reset.css">
 		<link rel="stylesheet" href="css/normalize.min.css">
 		<link rel="stylesheet" href="css/vendor/jquery-ui.css">
+		<link rel="stylesheet" href="css/libs/bootstrap.min.css">
+
 		<link rel="stylesheet" href="css/base.css">
 
-		<link rel="stylesheet" href="css/jquery.contextMenu.css">
-		<link rel="stylesheet" href="css/perfect-scrollbar.min.css">
+		<link rel="stylesheet" href="css/libs/jquery.contextMenu.css">
+		<link rel="stylesheet" href="css/libs/perfect-scrollbar.min.css">
 
 
 		<!--[if lt IE 9]>
@@ -120,7 +122,7 @@
 								</div>
 							</div>
 							<div id="filter-type">
-								<h3>Filter:</h3>
+								<h4>Filter:</h4>
 								<div id="types">
 									<!--to be populated by app-->
 								</div>
@@ -133,6 +135,7 @@
 							<div class="rect4"></div>
 							<div class="rect5"></div>
 						</div>
+						<h4 class="noDirectories">No directories to display</h4>
 						<nav id="navLeft">
 							<ul id="navContent" class="scrollable">
 								<!--to be populated by app-->
@@ -142,7 +145,7 @@
 							<input type="hidden" name="action" value="postFile">
 							<input type="hidden" name="fileName">
 							<input type="hidden" name="fileMachineName">
-							<input type="hidden" name="fileFolderID">
+							<input type="hidden" name="folderID">
 							<input type="hidden" name="fileType">
 							<input type="hidden" name="folderMachineName">
 							<input type="file" name="uploaded_file" accept="image/*, audio/*, video/*, .txt, .doc, docx">
@@ -151,7 +154,6 @@
 					<div class="main-container">
 						<div class="main wrapper clearfix">
 							<div id="mainContent">
-								<h3 class='noSelection'>Select a file in the menu or upload one using the right-click context menu on the menu.</h3>
 								<div class="spinner">
 									<div class="rect1"></div>
 									<div class="rect2"></div>
@@ -164,8 +166,8 @@
 									<div id="comments"></div>
 									
 									<form action="" method="POST" id="addComment">
-										<textarea name="usercomment" id="comment" rows="5" placeholder="Enter your comment" maxlength="500"></textarea>
-										<input id="submitComment" type="submit" value="Send comment">
+										<textarea name="usercomment" id="comment" rows="2" placeholder="Enter your comment" maxlength="500"></textarea>
+										<input id="submitComment" type="submit" value="Send">
 									</form>
 								</div>
 							</div>
@@ -177,23 +179,26 @@
 		</div>
 		<div class="footer-container">
 			<footer class="wrapper">
-				<h3>
-					<!--Not implemented yet-->
-				</h3>
+				<!--Not implemented yet-->
 			</footer>
 		</div>
 
 		<script src="js/vendor/jquery-1.11.0.min.js"></script>
 		<script src="js/vendor/jquery-ui-1.10.4.min.js"></script>
+
+		<script src="js/libs/bootstrap.min.js"></script>
 		
-		<script src="js/lib/underscore-min.js"></script>
-		<script src="js/lib/backbone-min.js"></script>
-		<script src="js/lib/backbone.localStorage.js"></script>
-		<script src="js/lib/jquery.highlight.js"></script>
-		<script src="js/lib/jquery.contextMenu.js"></script>
-		<script src="js/lib/perfect-scrollbar.min.js"></script>
+		<script src="js/libs/underscore-min.js"></script>
+		<script src="js/libs/backbone-min.js"></script>
+		<script src="js/libs/backbone.localStorage.js"></script>
+		<script src="js/libs/jquery.highlight.js"></script>
+		<script src="js/libs/jquery.contextMenu.js"></script>
+		<script src="js/libs/perfect-scrollbar.min.js"></script>
+		<script src="js/libs/bootbox.min.js"></script>
 
 		<script src="js/utils.js"></script>
+
+		<script src="js/config.js"></script>
 
 		<script src="js/models/file.js"></script>
 		<script src="js/models/folder.js"></script>
@@ -201,11 +206,11 @@
 		<script src="js/collections/fileList.js"></script>
 		<script src="js/collections/folderList.js"></script>
 		<script src="js/collections/fileCommentsList.js"></script>
+		<script src="js/routers/router.js"></script>
 		<script src="js/views/AppView.js"></script>
 		<script src="js/views/LoginView.js"></script>
 		<script src="js/views/NavView.js"></script>
 		<script src="js/views/FileCommentsView.js"></script>
-		<script src="js/routers/router.js"></script>
 		<script src="js/app.js"></script>
 	</body>
 </html>

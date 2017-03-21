@@ -10,12 +10,16 @@ app.AppView = Backbone.View.extend({
 
 		this.$headerContainer = this.$el.find('.header-container');
 		this.$container = this.$el.find("#container");
-		this.$footerContainer = this.$el.find('.footer-container');
+		this.$footerContainer = $('.footer-container');
 
+		AppRouter = new app.Router();
 		LoginView = new app.LoginView();
 
 		//set proper heights on init
 		this.resize();
+
+		this.loadThemeCSS(app.Config.theme);
+
 		$(window).on("resize", _.bind(this.resize, this));
 		$(window).bind("beforeunload", this.updateStatus);
 	},
@@ -36,5 +40,11 @@ app.AppView = Backbone.View.extend({
 	//triggered when user closes tab/window
 	updateStatus: function() {
 		app.utils.postData("updateStatus", {status: "offline"});
+	},
+	loadThemeCSS: function(href) {
+		if (app.Config.theme !== "") {
+			//append theme to page
+			$("head").append("<link rel='stylesheet' type='text/css' href='"+ href +"' />");
+		}
 	}
 });

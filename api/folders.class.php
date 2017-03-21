@@ -1,11 +1,13 @@
 <?php
 require_once 'database.class.php';
+require_once 'files.class.php';
 
 class Folders {
 	private $db;
 
 	public function __construct($db) {
 		$this->db = $db;
+		$this->files = new Files($db);
 
 		if (isset($_POST['action']) && !empty($_POST['action'])) {
 			$action = $_POST['action'];
@@ -71,6 +73,7 @@ class Folders {
 		$data = json_decode($_POST["_data"]);
 		$machineName = $data->machineName;
 		$id = $data->id;
+		$files = $data->files;
 
 		//delete folder
 		$this->db->query('DELETE FROM folders WHERE machine_name = :machineName');
@@ -82,11 +85,11 @@ class Folders {
 		$this->db->bind(':id', $id);
 		$this->db->execute();
 
-		//TODO
 		//delete comments referencing to that folder
-		/*$this->db->query('DELETE FROM fileComments WHERE folder_id = :id');
-		$this->db->bind(':id', $id);
-		$this->db->execute();*/
+		//loop through
+		foreach ($files as $file) {
+			$this->files->fileComments->deleteFileComments($file->id);
+		}
 
 		$path = "../".UPLOAD_DIR."/".$machineName;
 		$this->deleteFolderWithFiles($path);

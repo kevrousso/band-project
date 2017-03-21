@@ -24,7 +24,7 @@ class FileComments {
 	//get comments from files
 	public function getFileComments() {
 		//order by asc(default)
-		$this->db->query('SELECT id, username, file_id, comment, TIME_FORMAT(timestamp, "%H:%i") AS timestamp FROM fileComments ORDER BY timestamp');
+		$this->db->query('SELECT id, username, file_id, comment, TIME_FORMAT(timestamp, "%H:%i") AS timestamp FROM filecomments ORDER BY timestamp');
 		$comments = $this->db->resultSet();
 		echo json_encode($comments);
 	}
@@ -34,7 +34,7 @@ class FileComments {
 		$fileID = $data->fileID;
 		$comment = $data->comment;
 
-		$this->db->query('INSERT INTO fileComments (username, file_id, comment, timestamp) 
+		$this->db->query('INSERT INTO filecomments (username, file_id, comment, timestamp) 
 											VALUES (:username, :file_id, :comment, NOW())');
 		$this->db->bind(":username", $username);
 		$this->db->bind(":file_id", $fileID);
@@ -42,14 +42,14 @@ class FileComments {
 		$this->db->execute();
 
 		//return row
-		$this->db->query('SELECT id, username, file_id, comment, TIME_FORMAT(timestamp, "%H:%i") AS timestamp FROM fileComments WHERE id = :id');
+		$this->db->query('SELECT id, username, file_id, comment, TIME_FORMAT(timestamp, "%H:%i") AS timestamp FROM filecomments WHERE id = :id');
 		$this->db->bind(":id", $this->db->lastInsertID());
 		$comment = $this->db->single();
 		echo json_encode($comment);
 	}
 
 	public function deleteFileComments($file_id) {
-		$this->db->query('DELETE FROM fileComments WHERE file_id = :file_id');
+		$this->db->query('DELETE FROM filecomments WHERE file_id = :file_id');
 		$this->db->bind(':file_id', $file_id);
 		$this->db->execute();
 	}

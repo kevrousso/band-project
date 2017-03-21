@@ -1,9 +1,11 @@
 <?php 
 require_once 'database.class.php';
 require_once 'utils.class.php';
+require_once 'fileComments.class.php';
 
 class Files {
 	private $db;
+	public $fileComments;
 
 	public function __construct($db) {
 		$this->db = $db;
@@ -34,7 +36,7 @@ class Files {
 				//Model info
 				$fileName = $_POST["fileName"];
 				$fileMachineName = $_POST["fileMachineName"];
-				$fileFolderID = $_POST["fileFolderID"];
+				$folderID = $_POST["folderID"];
 				$fileType = $_POST["fileType"];
 				$folderMachineName = $_POST["folderMachineName"];
 
@@ -48,12 +50,12 @@ class Files {
 				$this->db->query('INSERT INTO files (
 						name, machine_name, folder_id, type, path, date_created
 					) VALUES (
-						:fileName, :fileMachineName, :fileFolderID, :fileType, :pathToFile, NOW()
+						:fileName, :fileMachineName, :folderID, :fileType, :pathToFile, NOW()
 					)'
 				);
 				$this->db->bind(':fileName', $fileName);
 				$this->db->bind(':fileMachineName', $fileMachineName);
-				$this->db->bind(':fileFolderID', $fileFolderID);
+				$this->db->bind(':folderID', $folderID);
 				$this->db->bind(':fileType', $fileType);
 				$this->db->bind(':pathToFile', $pathToFile);
 				$this->db->execute();
@@ -120,7 +122,7 @@ class Files {
 
 		$this->fileComments->deleteFileComments($fileID);
 
-		$pathToFile = UPLOAD_DIR."/".$folderMachineName."/".$fileMachineName;
+		$pathToFile = "../".UPLOAD_DIR."/".$folderMachineName."/".$fileMachineName;
 
 		//delete file in directory
 		unlink($pathToFile);
