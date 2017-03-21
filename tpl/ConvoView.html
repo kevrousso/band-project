@@ -1,0 +1,13 @@
+<% if (item) { %>
+<div class="comment">
+	<span class="user">
+		<span class="name"><%=item.username%></span>
+		<svg class="icon-user" viewBox="0 0 15 15">
+			<use xlink:href="#icon-user"></use>
+		</svg>
+	</span>
+	<p>
+		<%=item.message%>
+	</p>
+</div>
+<% } %>

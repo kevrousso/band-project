@@ -8,7 +8,10 @@ var app = app || {};
 			return _.map(response, function(item, index) {
 				return {
 					id: item.id,
-					userID: item.user_id
+					fileID: item.file_id,
+					username: item.username,
+					message: item.message,
+					timestamp: item.timestamp
 				};
 			});
 		}

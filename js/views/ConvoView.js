@@ -4,24 +4,35 @@ var app = app || {};
 		el: ".main-container",
 		events: {
 			'click a.timestamp': 'updateTimestamp',
-			'click a.fullscreen': 'toggleFullscreen'
+			'click a.fullscreen': 'toggleFullscreen',
+			'submit': 'postMessage'
 		},
-		initialize: function (user) {
+		initialize: function (data) {
 			var that = this;
 
-			this.user = user;
+			this.user = data.user;
 			this.$el.fadeIn(250).css("display", "table-cell");
 
+			this.$title = $('.header-container h1.title');
 			this.$mainContent = $('#mainContent');
-			this.$formConvo = $(".addComment");
+
+			this.$noSelection = this.$mainContent.find(".noSelection");
+
+			this.$data = this.$mainContent.find("#data");
+			this.$comments = this.$mainContent.find("#comments");
+			this.$formConvo = $("#addComment");
+			this.$message = this.$formConvo.find("#comment");
 			this.$spinner = this.$el.find(".spinner");
+
+			this.collection = new app.ConvoList();
+			//load proper template
+			app.utils.loadTemplate("ConvoView");
+
+			this.getConversations();
 
 			this.on("change:updateView", this.updateView, this);
 
-			this.collection = new app.ConvoList();
-			this.getConversations();
-
-			//TODO: on init, display a message in view like: Please select a file
+			this.updateWelcomeMsg();
 
 			return this;
 		},
@@ -32,9 +43,13 @@ var app = app || {};
 
 			this.filteredList = new app.ConvoList(filtered);
 
-			//TODO: render in html
+			//render in html
+			this.updateConversations();
 
 			return this;
+		},
+		updateWelcomeMsg: function() {
+			this.$title.html("Welcome " + this.user.capitalize() + "!");
 		},
 		//returns all the conversations
 		getConversations: function() {
@@ -43,25 +58,54 @@ var app = app || {};
 				data: {action: 'getConversations'},
 				type: "POST",
 				success: function(model, response) {
-					if (that.collection) {
-						console.log("Successs");
-					}
+
+				},
+				error: function(resp) {
+					console.log(resp);
 				}
 			});
+		},
+		postMessage: function() {
+			var that = this, message = this.$message.val();
+			app.utils.postData("postMessage", {username: this.user, fileID: this.fileID, message: message}, 
+				function(data, textStatus, jqXHR) {
+					if (textStatus === "success") {
+						var data = JSON.parse(data);
+
+						//add in models
+						var newConvo = new app.Convo({
+							id: data.id,
+							fileID: data.file_id,
+							username: data.username,
+							message: data.message,
+							timestamp: data.timestamp
+						});
+						that.collection.models.push(newConvo);
+						that.resetForm();
+						that.render();
+					}
+				}
+			);
+			return false;
+		},
+		resetForm: function() {
+			this.$formConvo.trigger("reset");
 		},
 		//filter the conversations with the appropriate file_id
 		//@param fileID: String
 		getFilteredByFileID: function(fileID) {
-			return _.find(this.collection, function(mod) {
+			var that = this;
+			return _.filter(that.collection.models, function(mod) {
 				return mod.get("fileID") === fileID;
 			});
 		},
+		//called from NavView
 		//@param data: Object {id, src, type}
 		updateView: function(data) {
 			var html = "", that = this, align = "";
 			data.src = data.src.substring(1);
 
-			this.fileID = data.id;
+			this.fileID = data.fileID;
 
 			switch (data.type) {
 				case "audio":
@@ -94,17 +138,32 @@ var app = app || {};
 					align = "middle";
 				break;
 			}
-			this.$mainContent.fadeOut(250, function (){
+			this.$noSelection.hide();
+			this.$mainContent.fadeOut(0, function (){
+				//TODO: updateSpinner()
 				that.$spinner.show().css("display", "table-cell");
+
 				//set proper align to conversations el
 				that.$el.css("vertical-align", align);
-				that.$mainContent.html("").append(html).stop(true, true);
+
+				//reset data elem and append new one
+				that.$data.html("").append(html).stop(true, true);
+
 				that.$spinner.fadeOut(250, function() {
 					that.$mainContent.fadeIn(250);
 				});
 			});
 			
 			this.render();
+		},
+		updateConversations: function() {
+			var that = this;
+			this.$comments.html("");
+			if ( this.filteredList.length ) {
+				this.filteredList.each(function(convo) {
+					that.$comments.append( that.template( {item: convo.toJSON()} ) );
+				});
+			}
 		},
 		updateTimestamp: function() {
 			var time = $(this).text(),

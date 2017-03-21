@@ -75,9 +75,8 @@ a { text-decoration: none; }
 }
 .wrapper { width: 90%;margin: 0 5%; }
 
-.header-container { border-bottom: 10px solid #0E1720; }
-
-.main-container h3.noPreview { text-align: center; }
+.main-container h3.noPreview,
+.main-container h3.noSelection{ text-align: center; }
 .main-container a.fullscreen img { width: 100%;height: 100%; }
 
 .header-container, .footer-container, .main nav { background: #0A0A0A; }
@@ -88,7 +87,8 @@ a { text-decoration: none; }
 	height: 115px;
 	border-top: 10px solid #0E1720;
 }
-.title { color: white; }
+.header-container .title { color: white; font-weight: normal; }
+.header-container .logout-wrap { float: right; }
 
 .full-img {
 	position: fixed;
@@ -285,14 +285,17 @@ form#upload input { display: none; }
 */
 
 /*Style 2*/
-#login form .input-wrap { position: relative; margin: 0 auto; display: table; background-color: rgba(34, 34, 34, 0.51); margin-top: 10px; }
-#login form input { width: 20em; margin: 0 auto; display: list-item; margin-bottom: 5px; margin-top: 5px; }
+#login form .input-wrap, #login form .rememberMe-wrap { position: relative; margin: 0 auto; display: table; background-color: rgba(34, 34, 34, 0.51); margin-top: 10px; }
+#login form .rememberMe-wrap { width: 10em; padding: 5px; }
+#login form .rememberMe-wrap label { color: #CCC; }
+#login form .rememberMe-wrap input[type="checkbox"] { margin-left: 20px; top: 2px; position: relative; }
+#login form input[type=text], #login form input[type=password] { width: 20em; margin: 0 auto; display: list-item; margin-bottom: 5px; margin-top: 5px; }
 #login form input[type=text], #login form input[type=password] { text-indent: 50px; opacity: 0.8; color: #EBEBEB; border: none; background-color: transparent; }
-#login form label { position: absolute; margin-top: 0.5em; left: 10px; }
+#login form .input-wrap label { position: absolute; color: #CCC; margin-top: 0.5em; left: 10px; }
 #login form .input-wrap:after { content: ""; position: absolute; left: 45px; top: 7px; height: 30px; border-left: 1px solid #FFF; }
 #login form input[type=submit] { width:0; padding: 0; border: none; }
 
-#login form .invalid {
+#login form .invalid, #login form .warning {
 	background-color: rgba(34, 34, 34, 0.85);
 	margin: 0 auto;
 	display: table;
@@ -300,6 +303,7 @@ form#upload input { display: none; }
 	margin-top: 10px;
 	display: none;
 }
+.message { color: #FFDC00 !important; }
 .error { color: #FF4136 !important; }
 
 #login form label svg { fill: #FFF; width: 25px; height: 25px; }
@@ -316,6 +320,7 @@ form#upload input { display: none; }
 #container { position: relative; }
 #interface-wrapper { display: inline-table; width: 100%; height: 100%; }
 .nav-container, .main-container { display: none; }
+.main-container #addComment { display: none; }
 nav#menu ul, #navContent, #navContent ul {
 	margin: 0;
 	padding: 0;
@@ -405,10 +410,8 @@ nav#menu a:hover {
 	.main-container {
 		display: table-cell;
 		vertical-align: middle;
-		border: 1px solid #ACA4A4;
 		border-right: none;
 		background-color: #FFF;
-		border-bottom: 0;
 		position: relative;
 	}
 	.nav-container, .main-container { display: none; }

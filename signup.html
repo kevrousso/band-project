@@ -1,3 +1,4 @@
+<?php session_start(); ?>
 <!DOCTYPE html>
 <!--[if lt IE 7]><html class="no-js lt-ie9 lt-ie8 lt-ie7"><![endif]-->
 <!--[if IE 7]><html class="no-js lt-ie9 lt-ie8"><![endif]-->
@@ -18,8 +19,11 @@
 		<link rel="stylesheet" href="css/normalize.min.css">
 		<link rel="stylesheet" href="css/base.css">
 
-		<script src="js/lib/jquery-1.11.0.min.js"></script>
-		<script src="js/lib/jquery-ui-1.10.4.min.js"></script>
+		<script src="js/vendor/jquery-1.11.0.min.js"></script>
+		<script src="js/vendor/jquery-ui-1.10.4.min.js"></script>
+
+		<script src="js/utils.js"></script>
+
 		<!--[if lt IE 9]>
 		<script src="js/vendor/html5-3.6-respond-1.1.0.min.js"></script>
 		<![endif]-->
@@ -41,6 +45,27 @@
 					};
 					resize();
 					$(window).on("resize", resize);
+
+					$("#newUser").submit(function() {
+						var username = $("#username").val(),
+							password = $("#password").val();
+						app.utils.postData("createUser", { username: username, password: password }, function(data, textStatus, jqXHR) {
+							var data = data !== "" ? JSON.parse(data) : false, 
+								error = data.error, 
+								$invalid = $(".invalid");
+							
+							$invalid.html("");
+							
+							if (error) {
+								$invalid
+									.html("<span class='message'>"+data.error+"</span>")
+									.fadeIn("fast").css("display", "table");
+							} else {
+								window.location = "index.html";
+							}
+						});
+						return false;
+					});
 				});
 			})(jQuery, this);
 		</script>
@@ -91,7 +116,7 @@
 					<div id="login">
 						<h1 class="bandname">innervate</h1>
 						<h2>Create A New Account</h2>
-						<form action="app.php" method="POST" autocomplete="off">
+						<form id="newUser" action="" method="POST" autocomplete="off">
 							<input type="hidden" name="action" value="createUser">
 							<div class="spinner">
 								<div class="rect1"></div>
@@ -108,15 +133,13 @@
 								</label>
 								<input type="text" value="" name="username" id="username" maxlength="10" placeholder="USERNAME" autofocus required></div>
 							<div class="input-wrap">
-								<label for="pass">
+								<label for="password">
 									<svg class="icon icon-pass" viewBox="0 0 15 15">
 										<use xlink:href="#icon-pass"></use>
 									</svg>
 								</label>
-								<input type="password" value="" name="pass" id="pass" maxlength="20" placeholder="PASSWORD" required></div>
-							<div class="invalid">
-								<span class="error"></span>
-							</div>
+								<input type="password" value="" name="password" id="password" maxlength="20" placeholder="PASSWORD" required></div>
+							<div class="invalid"></div>
 							<input type="submit" value="SIGN UP"></form>
 					</div>
 				</div>

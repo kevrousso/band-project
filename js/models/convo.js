@@ -2,8 +2,10 @@
 
 	app.Convo = Backbone.Model.extend({
 		defaults: {
-			//TODO: make proper defaults
 			id: 0,
-			userID: 0
+			fileID: 0,
+			username: "",
+			message: "",
+			timestamp: ""
 		}
 	});

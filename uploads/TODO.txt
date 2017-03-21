@@ -1,0 +1,33 @@
+﻿Back-end:
+
+- try and replicate https://github.com/ccoenraets/backbone-cellar
+
+- On file create, move uploaded file to associated directory
+
+- email alert if someone posted something
+- chat (
+	replicate: http://code.tutsplus.com/tutorials/how-to-create-a-simple-web-based-chat-application--net-5931
+	or: http://fr.openclassrooms.com/informatique/cours/un-chat-en-php-ajax
+	)
+- connected users (online/offline property in SQL and in user-model)
+
+
+##### General ideas ######
+- Merge Index.html and Signup.html
+
+- adjust nav Routing to be more like filter routing
+- adjust event functions so that we can call them without passing (e) target
+    ->>> REMOVE Events handlers and only add selectMenuItem() and call it in router. It will be called when user click on links
+
+- Expand all folders after search, un-expand them on clear search  (showContent() refactor )
+
+- add spinner dynamically when needed, and add fadeIn Out of navContent when item is clicked
+
+- Replace fadeIn().css("display", "...") to an animate() that toggles opacity (try removing CSS in JS)
+
+- Create better namespace on $.Innervate. Wrap each code files with siaf. $ in param will already contains Innervate
+
+BUG:
+
+//weird bug when adding a folder, then adding a file in that folder: file gets a id < folder's id
+	// ^still relevent ?

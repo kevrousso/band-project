@@ -8,7 +8,9 @@ var app = app || {};
 
 			this.$headerContainer = $('.header-container');
 			this.$footerContainer = $('.footer-container');
+			this.$logout = this.$headerContainer.find("a.logout");
 
+			this.$logout.on("click", this.logout);
 			LoginView = new app.LoginView();
 
 			//set proper heights on init
@@ -22,4 +24,11 @@ var app = app || {};
 
 			this.$el.css("min-height", newHeight);
 		},
+		logout: function() {
+			app.utils.postData("logout", {}, function(data, textStatus, jqXHR) {
+				if (textStatus === "success") {
+					window.location = "index.html";
+				}
+			});
+		}
 	});

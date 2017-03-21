@@ -3,48 +3,53 @@ var app = app || {};
 	app.LoginView = Backbone.View.extend({
 		el: ".login-container",
 		events: {
-			"submit form": "validate"
+			"submit form": "login"
 		},
 		initialize: function () {
 			var that = this;
 			this.$form = this.$el.find('form');
 			this.$username = this.$form.find("#username");
-			this.$username = this.$form.find("#username");
-			this.$pass = this.$form.find("#pass");
+			this.$password = this.$form.find("#password");
+			this.$rememberMe = this.$form.find("#rememberMe");
 			this.$submitBtn = this.$form.find("input[type=submit]");
+			this.$warning = this.$form.find(".warning");
 			this.$invalid = this.$form.find(".invalid");
-			this.$error = this.$invalid.find(".error");
 			this.$spinner = this.$el.find(".spinner");
 
-			this.isLogguedIn();
+			this.isLogged();
+			
 			return this;
 		},
-		isLogguedIn: function() {
+		isLogged: function() {
 			var that = this;
-			app.utils.postData("isLogguedIn", {}, function(data, textStatus, jqXHR) {
-				data = data !== "" ? JSON.parse(data) : false;
+			app.utils.postData("isLogged", {}, function(data, textStatus, jqXHR) {
 				if (data) {
 					//init Navigation View
 					NavView = new app.NavView();
 					ConvoView = new app.ConvoView({user: data});
 				} else {
+					//not logged-in, show the form
 					that.$el.show();
 					return false;
 				}
 			});
 		},
-		validate: function() {
+		login: function() {
 			var that = this,
 				username = this.$username.val(),
-				pass = this.$pass.val();
+				password = this.$password.val(),
+				rememberMe = this.$rememberMe.is(":checked");
 
 			this.$invalid.fadeOut('fast');
+			//TODO: updateSpinner()
 			this.$spinner.fadeIn("fast", function() {
-				app.utils.postData("login", {username: username, pass: pass}, 
+				app.utils.postData("login", {username: username, password: password, rememberMe: rememberMe}, 
 					function(data, textStatus, jqXHR) {
 						that.$spinner.fadeOut("slow", function() {
-							data = JSON.parse(data);
-							if (!data.invalid) {
+							if (app.utils.isJson(data)) {
+								data = JSON.parse(data);
+							}
+							if (!data.error) {
 								that.$el.fadeOut(250, function() {
 									//init Navigation View
 									NavView = new app.NavView();
@@ -61,16 +66,25 @@ var app = app || {};
 		},
 		//@param data: Object
 		showErrorMsg: function(data) {
-			var msg = "", $el, invalid = data.invalid;
-			if (invalid) {
-				if (invalid === "username") {
-					$el = this.$username;
-				} else if (invalid === "password") {
-					$el = this.$pass;
-				}
-				$el[0].setSelectionRange(0, $el.val().length);
-				$el.focus();
-				this.$error.text("Invalid "+ app.utils.capitalize(invalid));
+			var msg = "", $el, message = data.message, error = data.error;
+			if (message) {
+				//append the messages
+				this.$username.focus();
+				//for (var i = 0; i < data.errors.length; i++) {
+				this.$warning.html("");
+				this.$warning.html("<span class='message'>"+message+"</span>");
+				//};
+				
+				this.$warning.fadeIn("fast").css("display", "table");
+			}
+			if (error) {
+				//append the errors
+				this.$username.focus();
+				//for (var i = 0; i < data.errors.length; i++) {
+				this.$invalid.html("");
+				this.$invalid.append("<span class='error'>"+error+"</span>");
+				//};
+				
 				this.$invalid.fadeIn("fast").css("display", "table");
 			}
 		}

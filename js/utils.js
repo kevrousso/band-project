@@ -19,6 +19,7 @@ var app = app || {};
 				}
 			});
 		},
+		//Took from: https://gist.github.com/hoanvuso/502e6d5c084ea7b7763b
 		//@param views: String or Array
 		//@param callback: function
 		loadTemplate: function(views, callback) {
@@ -35,6 +36,10 @@ var app = app || {};
 			});
 			$.when.apply(null, deferreds).done(callback);
 		},
+		
+		//Took from: https://gist.github.com/hoanvuso/502e6d5c084ea7b7763b
+		//CHECK OUT ALSO: https://blueimp.github.io/jQuery-File-Upload
+
 		//TODO: use this instead of submitting the form for addFile
 		uploadFile: function (file, callbackSuccess) {
 			var self = this;
@@ -66,8 +71,15 @@ var app = app || {};
 					  .replace(/[ÝŸ]/g, "Y").replace(/[ýÿ]/g, "y")
 					  .replace(/ /g, "_");
 		},
-		//@param str: String
-		capitalize: function(str) {
-			return str.charAt(0).toUpperCase() + str.slice(1);
-		}
+		isJson: function(str) {
+			try {
+				JSON.parse(str);
+			} catch (e) {
+				return false;
+			}
+			return true;
+		}		
 	}
+String.prototype.capitalize = function() {
+	return this.charAt(0).toUpperCase() + this.slice(1);
+}

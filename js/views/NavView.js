@@ -56,6 +56,8 @@ var app = app || {};
 			this.filteredList = new app.FolderList(filtered);
 
 			this.$navContent.hide().html("");
+
+			//TODO: updateSpinner()
 			this.$spinner.show().css("display", "table-cell");
 			if ( this.filteredList.length ) {
 				this.filteredList.each(function(folder) {
@@ -167,7 +169,8 @@ var app = app || {};
 
 								that.render();
 
-								//can't use this as we need the file to be posted $_FILES
+								////can't use this as we need the file to be posted $_FILES
+								//TODO: look in utils.js for uploadFile()
 								//app.utils.postData("postFile", newFile.toJSON());
 
 								that.$formAddFile.find("input[name=fileName]").val(newFile.get("name"));
@@ -181,7 +184,7 @@ var app = app || {};
 						} else {
 							//Prevent default and display error
 							e.preventDefault();
-							alert("File is exceeding max file size of: 10mb.");
+							alert("File is exceeding max file size of: 10MB.");
 						}
 						//reset the input file
 						$(this).val("");
@@ -311,9 +314,10 @@ var app = app || {};
 		getFolders: function() {
 			var that = this;
 			this.collection.fetch({
-				data: {action: 'getFolders'},
+				data: { action: 'getFolders' },
 				type: "POST",
 				success: function(model, response) {
+					//TODO: mergeFilesInFolders()
 					if (that.collection) {
 						//merge the files in folders, matching folder.id -> file.folderID
 						that.collection.each(function(folder, index) {
@@ -337,6 +341,7 @@ var app = app || {};
 							Backbone.history.start();
 						}
 					} else {
+						//TODO: updateSpinner()
 						this.$spinner.hide();
 						this.$navContent.show().html("No directories to display");
 					}
@@ -420,7 +425,7 @@ var app = app || {};
 					//only accept same type
 					newM = _.filter(files, function(file) {
 						if (type === 'all') {
-							return file.get("name").indexOf(str.toLowerCase()) !== -1;
+							return file.get("name").toLowerCase().indexOf(str.toLowerCase()) !== -1;
 						} else {
 							return file.get("name").toLowerCase().indexOf(str.toLowerCase()) !== -1 && file.get("type") === type;
 						}
@@ -443,7 +448,7 @@ var app = app || {};
 			//highlight searchFilter in filenames
 			this.$el.find('.content li').highlight(this.searchFilter);
 		},
-		//@param data: object {src: , type: }
+		//@param data: object {fileID:"", src:"", type:""}
 		updateViewArea: function(data) {
 			ConvoView.trigger("change:updateView", data);
 		}
