@@ -63,7 +63,7 @@ app.NavView = Backbone.View.extend({
 		this.updateWelcomeMsg(this.user);
 
 		this.resize();
-		//$(window).on("resize", this.resize);
+		$(window).on("resize", _.bind(this.resize, this));
 
 		return this;
 	},

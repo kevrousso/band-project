@@ -51,13 +51,14 @@ app.FileCommentsView = Backbone.View.extend({
 	},
 	setupResizable: function() {
 		var that = this;
+		var mainContentWidth = this.$mainContent.outerWidth();
 		var mainContentHeight = this.$mainContent.outerHeight();
 
-		this.maxHeight = Math.round(mainContentHeight * config.max_width_for_nav_view / 100);
+		this.maxWidth = Math.round(mainContentWidth * config.max_width_for_nav_view / 100);
 		this.$data.resizable({
 			handles: "s",
-			"minHeight": 70,
-			"maxHeight": this.maxHeight,
+			"minHeight": mainContentWidth,
+			"maxWidth": this.maxWidth,
 			resize: function(e, ui) {
                 that.resize();
             },
