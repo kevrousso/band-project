@@ -51,14 +51,12 @@ app.FileCommentsView = Backbone.View.extend({
 	},
 	setupResizable: function() {
 		var that = this;
-		var mainContentWidth = this.$mainContent.outerWidth();
 		var mainContentHeight = this.$mainContent.outerHeight();
 
-		this.maxWidth = Math.round(mainContentWidth * config.max_width_for_nav_view / 100);
+		this.maxHeight = Math.round(mainContentHeight * config.max_split_percent / 100);
 		this.$data.resizable({
 			handles: "s",
-			"minHeight": mainContentWidth,
-			"maxWidth": this.maxWidth,
+			"maxHeight": this.maxHeight,
 			resize: function(e, ui) {
                 that.resize();
             },
@@ -66,9 +64,6 @@ app.FileCommentsView = Backbone.View.extend({
 		this.resizableInitialized = true;
 	},
 	resize: function() {
-		var dataHeight = this.$data.outerHeight();
-		var mainContentHeight = this.$mainContent.outerHeight();
-		this.$content.outerHeight(mainContentHeight - dataHeight);
 		this.$scrollable.perfectScrollbar('update');
 
 		this.resizeScrollable();
@@ -81,9 +76,8 @@ app.FileCommentsView = Backbone.View.extend({
 	resizeScrollable: function() {
 		var that = this;
 		var dataHeight = this.$data.outerHeight();
-		var formConvoHeight = this.$formConvo.outerHeight();
 		var mainContentHeight = this.$mainContent.outerHeight();
-		var newHeight = mainContentHeight - dataHeight - formConvoHeight;
+		var newHeight = mainContentHeight - dataHeight;
 
 		this.$scrollable.css("max-height", newHeight);
 	},
@@ -262,10 +256,16 @@ app.FileCommentsView = Backbone.View.extend({
 	formatMessageTimeReference: function(comment) {
 		/*
 		Format: Lorem ipsum @12:55 dolor sit 
+				or
+				Lorem ipsum 12:55 dolor sit
 			->  Lorem ipsum <a href="#" class="time">12:55</a> dolor sit
 		*/
-		return comment.get("comment").replace(/\@\d{1,2}:\d{2}/, function(time) {
-			return "<a href='"+time.replace("@", "#")+"' class='time'>" + time.replace("@", "") + "</a>";
+		return comment.get("comment").replace(/\@\d{1,2}:\d{2}|\d{1,2}:\d{2}/, function(time) {
+			if (time.charAt(0) === "@") {
+				return "<a href='"+time.replace("@", "#")+"' class='time'>" + time.replace("@", "") + "</a>";			
+			} else {
+				return "<a href='#"+time+"' class='time'>" + time + "</a>";
+			}
 		});
 	},
 	updateMessageTime: function(e) {

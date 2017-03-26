@@ -11,7 +11,7 @@ app.Config = {
 	allow_deleting_folders_with_files: false,
 
 	//width in %.
-	max_width_for_nav_view: 40,
+	max_split_percent: 40,
 
 	//TODO: maybe just "../css/theme1.css" | "../css/theme2.css"...
 	theme: "",

@@ -73,8 +73,11 @@ app.NavView = Backbone.View.extend({
 	},
 	resize: function() {
 		// totalWidth * %/100
-		this.maxWidth = Math.round(this.$container.outerWidth() * config.max_width_for_nav_view / 100);
-		this.$el.resizable({ handles: "e", "maxWidth": this.maxWidth });
+		this.maxWidth = Math.round(this.$container.outerWidth() * config.max_split_percent / 100);
+		this.$el.resizable({
+			handles: "e",
+			"maxWidth": this.maxWidth
+		});
 
 		//TODO: this should do a trigger instead,
 		//		and AppView should listen to it
@@ -87,7 +90,7 @@ app.NavView = Backbone.View.extend({
 		this.$navContent.outerHeight(window.innerHeight - headerContainerHeight - footerContainerHeight - filtersHeight);
 		this.$scrollable.perfectScrollbar('update');
 	},
-	render: function() {
+	render: function(silent) {
 		var that = this;
 		var filtered = this.getFilteredBySearchAndType(this.searchFilter, this.filterType);
 
@@ -120,8 +123,10 @@ app.NavView = Backbone.View.extend({
 			useKeyboard: false
 		});
 
-		//set no selection (by not passing any data)
-		this.updateViewArea();
+		if (!silent) {
+			//set no selection (by not passing any data)
+			this.updateViewArea();
+		}
 
 		this.resize();
 
@@ -537,12 +542,12 @@ app.NavView = Backbone.View.extend({
 	},
 	/*Filter events*/
 	filterBySearch: function() {
-		this.render();
+		this.render(true);
 	},
 	filterByType: function() {
 		if (!this.$types.find('a[href^=#'+this.filterType+']').hasClass('selected')) {
 			AppRouter.navigate('filter/' + this.filterType);
-			this.render();
+			this.render(true);
 		}
 	},
 	clearSearch: function() {
@@ -550,7 +555,7 @@ app.NavView = Backbone.View.extend({
 		this.searchFilter = "";
 		$('#searchBox').val(this.searchFilter);
 
-		this.render();
+		this.render(true);
 		AppRouter.navigate('filter/' + this.filterType);
 
 		this.$el.find('.content li').removeHighlight();
