@@ -25,8 +25,7 @@ app.NavView = Backbone.View.extend({
 		this.$title = this.$headerContainer.find('h1.title');
 		this.$el.fadeIn(250).css("display", "table-cell");
 
-		this.$navContent = this.$el.find("#navContent");
-		this.$scrollable = this.$el.find(".scrollable");
+		this.$navLeft = this.$el.find("#navLeft");
 		
 		this.$formAddFile = this.$el.find("#upload");
 		this.$noDirectories = this.$el.find(".noDirectories");
@@ -87,8 +86,8 @@ app.NavView = Backbone.View.extend({
 		var footerContainerHeight = this.$footerContainer.outerHeight();
 		var filtersHeight = this.$filters.outerHeight();
 
-		this.$navContent.outerHeight(window.innerHeight - headerContainerHeight - footerContainerHeight - filtersHeight);
-		this.$scrollable.perfectScrollbar('update');
+		this.$navLeft.outerHeight(window.innerHeight - headerContainerHeight - footerContainerHeight - filtersHeight);
+		this.$navLeft.find(".scrollable").perfectScrollbar('update');
 	},
 	render: function(silent) {
 		var that = this;
@@ -98,26 +97,29 @@ app.NavView = Backbone.View.extend({
 
 		this.$searchBox.attr("disabled", this.collection.length === 0);
 
-		this.$navContent.hide().empty();
+		this.$navLeft.hide().empty();
 
 		utils.showLoadingBox();
 		if (this.filteredList.length) {
+			var newHTML = '<ul id="navContent" class="scrollable">';
 			this.filteredList.each(function(folder) {
-				that.$navContent.append( that.template( {item: folder.toJSON()} ) );
+				newHTML += that.template( {item: folder.toJSON()});
 			});
+			newHTML += '</ul>';
+			that.$navLeft.append(newHTML);
 			this.$noDirectories.hide();
 		} else {
 			this.$noDirectories.show();
 		}
 
 		utils.hideLoadingBox();
-		this.$navContent.fadeIn(250);
+		this.$navLeft.fadeIn(250);
 
 		//empty and update Filters
 		this.$types.empty().append(that._createFilters());
 		this.updateSearchUI();
 		this.updateFiltersUI();
-		this.$scrollable.perfectScrollbar({
+		this.$navLeft.find(".scrollable").perfectScrollbar({
 			suppressScrollX: true,
 			minScrollbarLength: 100,
 			useKeyboard: false
@@ -225,6 +227,7 @@ app.NavView = Backbone.View.extend({
 						var fileType = fileInfo.type.split("/")[0]; //audio, video, ...
 						var fileExt = fileInfo.name.split(".")[fileInfo.name.split(".").length-1];
 
+						//check that file extension is valid as per config
 						if (fileInfo && _.contains(config.accepted_file_extensions, fileExt)) {
 							
 							var folder = that.getModelByName(that.collection.models, name);
@@ -260,7 +263,7 @@ app.NavView = Backbone.View.extend({
 							}
 						} else {
 							//file not found or not supported
-							bootbox.alert("<span class='warning'>File could not be added. Verify that the file extension ("+fileExt+") is supported by the application:<br>[" + config.accepted_file_extensions.toString().split(",").join(", ") + "]</span>");
+							bootbox.alert("<span class='warning'>File could not be added. Verify that the file extension ("+fileExt+") is supported by the application.<br>Supported types:<br>[" + config.accepted_file_extensions.toString().split(",").join(", ") + "]</span>");
 							console.log("File could not be added.");
 						}
 					}
@@ -510,14 +513,14 @@ app.NavView = Backbone.View.extend({
 		}
 
 		this.currentfolder = e.target.text;
-		this.$scrollable.perfectScrollbar('update');
+		this.$navLeft.find(".scrollable").perfectScrollbar('update');
 		return false;
 	},
 	//TODO: should be replaced by toggleFolderView in a good way..
 	toggleFoldersView: function() {
 		if (this.searchFilter !== "") {
-			this.$navContent.find(".hasContent").addClass("opened");
-			this.$navContent.find(".content").stop(true, true).slideDown(250);
+			this.$navLeft.find(".hasContent").addClass("opened");
+			this.$navLeft.find(".content").stop(true, true).slideDown(250);
 		}
 	},
 	// TODO: make function without args, bing it to (change:showContent)
