@@ -20,6 +20,9 @@ app.AppView = Backbone.View.extend({
 
 		AppRouter = new app.Router();
 		LoginView = new app.LoginView({
+			//TODO: so wrong... 
+			//		should throw an event in the vent instead,
+			//		and the appView should listen to it
 			appView: this
 		});
 

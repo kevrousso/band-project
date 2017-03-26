@@ -1,0 +1,128 @@
+//using Sublime Text 2 plugin "PlainTasks"
+//https://github.com/aziz/PlainTasks
+
+/*
+	On server change, don't forget to modify:
+	upload_max_filesize=10M
+	post_max_size=10M
+	allow_url_fopen=On //not sure.. was used for downloading some time 
+in php.ini
+*/
+
+Story:
+
+
+BUG:
+	→	@critical When uploading biiiiig files, we get a warning in the Network tab instead of our custom error message, and an empty file is added in collection
+	→	Resize save icon
+	→	When adding file (also when renaming), check for name if contains wrong chars: (;:<>~`¨-=+\/|!@#$%?&*()¤{}[]¬)...
+	→	No sound on mp4 videos ? verify with other types
+	→	@high (Bug)(CSS) When changing filter, the scrollbar in NavView doesn't show anymore
+	→	signup page: background not filled 100%
+	→	(Bug) User.status does not always sets to offline when closing browser
+		if(status == 'Away') {
+			intervalDisconnect = setTimeout(App.disconnect, 2h);
+		}
+		...clearInterval(intervalDisconnect);
+
+Task:
+
+
+Improvement:
+	→	STOP manually updating the collection/models....it SHOULD updates itself on changes...
+	→	Make a json file with the French/English languages translations
+	→	Should have only one "main" collection in NavView.js
+		(this.collection, not this.files)
+	→	Add debug mode for error loging and warnings
+		→	Create log file
+	→	Add Venting for triggers and listening
+	→	Remove jquery global selectors in views... $("#container") ...
+	→	Add warn, error icons to bootbox..?
+	→	When adding an image while in filter "File", move filter to "Image" and expand folder, highlight yellow image
+	→	We might not want to let users <Rename, delete> because of versioning.. (make sure errors will trigger)
+		or maybe if someone edit same file, it would throw error in the meantime?
+	→	Put border-bottom color on input[type="text"] focused
+	→	news feed on the right (maybe like facebook?)
+	→	Calendrier
+	→	add user control for public (not able to download or search. Just able to view links send)
+		//'guest'
+
+	→	(Back-end) add error severity levels (need to show popup or just log)
+		→	try and replicate https://github.com/ccoenraets/backbone-cellar (in terms of routing)
+	→	(Back-end) email alert if someone posted something (subscribe)
+	→	(Back-end) chat (
+			replicate: http://code.tutsplus.com/tutorials/how-to-create-a-simple-web-based-chat-application--net-5931
+			or: http://fr.openclassrooms.com/informatique/cours/un-chat-en-php-ajax
+		)
+	→	(Back-end) Authentication: JWT https://github.com/firebase/php-jwt/blob/master/Authentication/JWT.php
+
+Idea:
+	→	Fix font size in general
+	→	adjust event functions so that we can call them without passing (e) target
+	  REMOVE Events handlers and only add selectMenuItem() and call it in router. It will be called when user click on links
+	→	RE-FACTOR ConvoView (convo, conversations, etc) to something like InfoView
+	→	RE-FACTOR: Split ConvoView to ( previewView, fileCommentsView )
+	→	RE-FACTOR: Split NavView to (FilterView, SearchView, NavView)
+	→	Replace fadeIn().css("display", "...") to an animate() that toggles opacity (try removing CSS in JS)
+	→	Create better namespace on $.Innervate. Wrap each code files with siaf. $ in param will already contains Innervate
+
+	→	Add no internet mode (backbone.localstorage), and server mode (SQL)
+		https://github.com/mattzeunert/minmal-Backbone.localStorage-example
+		→	Export: localstorage afterwards in json file (localstorage var is in window global, just copy paste in json file when exiting)
+		→	Import:
+			var data = JSON.parse(previously_exported_string);
+			for (var key in data) {
+			  localstorage[key] = data[key];
+			}
+
+＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿
+Archive:
+	✔	BUG:	There shouldn't be a scrollbar on "No Comments yet!..." @done (16-01-06 21:30)
+	✘	Improvement:	When resizing something not ready to be shown yet: @cancelled (16-01-02 22:00)
+		1. left: -99999999px;
+		2. resize based on main container
+		3. hide main container, remove left -999999999px;
+		4. fadeIn()
+	✔	Improvement:	RE-FACTOR loading spinner dynamically when needed, and add fadeIn/Out on navContent when item is clicked @done (16-01-02 22:00)
+		Jquery.BlockUI.js ???
+	✔	Bug:	@critical When selecting another file, the resizable doesn't exist anymore @done (16-01-02 21:02)
+	✔	Bug:	@critical South resize in fileComments view is not under #data, but at the very bottom instead @done (16-01-01 23:10)
+	✔	Bug:	@critical (CSS) When selecting a file, the scrollbar in FileCommentView doesn't show anymore @done (16-01-01 01:05)
+	✘	Improvement:	When hovering a row comment, show the full date. Else, show time. @cancelled (15-12-30 22:57)
+	✔	Improvement:	If chars near limit, put remaining characters left (7/10)	 @done (15-12-30 10:15)
+	✔	Improvement:	Add maxlength to inputs @done (15-12-30 10:15) @project(TODO next)
+	✔	Improvement:	Add divider in ConvoView between the preview and conversations  @done (15-12-30 09:15)
+		picture
+		( |_________________ )
+		|  comment
+	✔	Bug:	image full size (resize prob, ratio-height too big) @done (15-12-28 19:39) @project(BUGS)
+	✘	Task:	(Download works in JS)Test download in real server...maybe jsfiddle? @cancelled (15-12-24 14:29) @project(TODO next)
+	✔	Bug:	Sign up page: fix error messages in bootbox (see FIXMEs) @done (15-12-23 12:50)
+	✔	Bug:	When adding a file that is beyond the upload_max_filesize, the collection should not add it. @done (15-12-23 12:33) @project(TODO next)
+	✔	Improvement:	block user to select anyother file types @done (15-12-23 12:20) @project(TODO next)
+	✔	Improvement:	In File comment view, put textarea on top, and reverse comments history @done (15-12-21 20:02) @project(TODO next)
+		remove the Submit button also
+	✔	Task:	Test adding file exceeding file size in php.ini @done (15-12-20 19:47) @project(TODO next)
+	✔	Improvement:	Adjust nav Routing to be more like filter routing @done (15-12-20 18:55) @project(General ideas)
+	✔	Improvement:	Replace/keep existing + add alert popup for Renaming with an input replacing the text, triggered on double-click @done (15-12-20 18:54) @project(General ideas / Improvements)
+	✔	Improvement:	Keep selected element when navView renders? @done (15-12-20 18:54) @project(General ideas / Improvements)
+	✔	Story:	On file create, move uploaded file to associated directory  @done (15-12-20 18:36) @project(Back-end)
+		(uploads/Test1/filename.mp3)
+	✔	Improvement:	Replace the AddFile form to an ajaxPost with the FormData method @done (15-12-20 18:34) @project(TODO next)
+		we do not want to refresh the page on submit, in case or errors happening before refresh
+	✔	Improvement:	Add this style to all but comments (to body, comments: initial;) @done (15-12-20 18:32) @project(TODO next)
+		.noselect {
+		webkit-touch-callout: none;
+		webkit-user-select: none;
+		khtml-user-select: none;
+		moz-user-select: none;
+		ms-user-select: none;
+		user-select: none;
+		}
+	✔	Task:	test if we can post comments with fr accents... @done (15-12-20 18:29) @project(TODO next)
+	✔	Improvement:	Comments @done (15-12-20 18:23) @project(TODO next)
+		{
+		if comment == today:  	16:45
+		if comment !== today:  	"23 décembre à 16:45"
+		}
+	✔	Improvement:	Download in right-click @done (15-01-19 09:53) @project(General ideas / Improvements)

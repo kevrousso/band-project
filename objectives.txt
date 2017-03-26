@@ -1,0 +1,12 @@
+objectifs:
+- gérer des fichiers (txt, doc, videos, audios, images)
+- gérer des dossiers
+- ajouter des commentaires aux fichiers
+- ajouter des marques-temps sur fichiers audios (et videos?)
+- suprimer des dossiers vides et qui contiennent des fichiers
+- gérer des sessions utilisateurs
+- utiliser et faire jouer des videos et audios
+- visionner des images
+- renommer des fichiers-dossiers
+- créer un profil usager
+- chercher par filtres (types, mots-clés)

@@ -68,8 +68,7 @@ class Files {
 			} else {
 				$max_upload = $this->getMaxFileSizeUpload();
 				if ($_FILES['uploaded_file']['size'] == 0) {
-					$this->utils->error = 'Error code: '. intval($_FILES['uploaded_file']['error']) .
-						'<br />Unable to upload file. Uploaded file size is greater than the max file size upload of ' . $max_upload . 'MB.';
+					$this->utils->error = 'Error code: '. intval($_FILES['uploaded_file']['error']) . '. Unable to upload file. Uploaded file size is greater than the max file size upload of ' . $max_upload . 'MB.';
 				} else {
 					//throw generic error
 					$this->utils->error = 'An error occured while the file was being uploaded. '
