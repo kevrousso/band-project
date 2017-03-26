@@ -10,7 +10,22 @@ in php.ini
 */
 
 Story:
-
+	→	Add Tortoise SVN ?
+	→	Add RequireJS
+		→	Add Configuration
+		→	Wrap all JS in modules
+		→	Re-work the venting
+	→	Add MarionetteJS to Backbone
+	→	Add HandlebarsJS
+		→	Remove existing templating (underscoreJS and loadTemplate() in utils.js) 
+		→	Add requirejs config
+		→	Re-work the index.html to split into reusable templates
+	→	Add a build system
+		→	Add SCSS watcher
+		→	Add build minimification
+	→	Add SCSS
+		→	Clean up CSS
+		→	Translate CSS in SCSS
 
 BUG:
 	→	@critical When uploading biiiiig files, we get a warning in the Network tab instead of our custom error message, and an empty file is added in collection
